@@ -28,6 +28,14 @@ RUN git clone https://github.com/Kwaai-AI-Lab/PAIAssistant.git
 # Install npm dependencies for the web component
 RUN cd PAIAssistant/web && npm install
 
+#adding underlying libraries for sentencepiece
+RUN apt-get install -y libprotobuf-dev protobuf-compiler
+
+#trying to resolve issue by installing sentencepiece directly from its wheel file
+#RUN pip install https://files.pythonhosted.org/packages/65/ae/e0e0b5b68362a0905f7d78348e82c3f3a68d4b4a21b5d6d00702a88f7b4c/sentencepiece-0.1.96-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl
+RUN pip install sentencepiece
+
+
 # Install Python dependencies for the API component
 RUN cd /PAIAssistant/api && pip install -r requirements.txt
 

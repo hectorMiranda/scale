@@ -1,0 +1,861 @@
+C:\kwaai\docker>docker build -t paiassistant .
+[+] Building 304.9s (16/19)
+ => [internal] load build definition from Dockerfile                                                                                 0.0s
+ => => transferring dockerfile: 32B                                                                                                  0.0s
+ => [internal] load .dockerignore                                                                                                    0.0s
+ => => transferring context: 2B                                                                                                      0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:20.04                                                                      1.9s
+ => [auth] library/ubuntu:pull token for registry-1.docker.io                                                                        0.0s
+ => [ 1/15] FROM docker.io/library/ubuntu:20.04@sha256:80ef4a44043dec4490506e6cc4289eeda2d106a70148b74b5ae91ee670e9c35d              0.0s
+ => CACHED [ 2/15] RUN apt update && apt upgrade -y && apt-get update                                                                0.0s
+ => CACHED [ 3/15] RUN apt install -y net-tools software-properties-common curl git npm     libsndfile1 libasound2-dev ffmpeg pkg-c  0.0s
+ => CACHED [ 4/15] RUN add-apt-repository ppa:deadsnakes/ppa -y                                                                      0.0s
+ => CACHED [ 5/15] RUN apt update && apt install -y --fix-missing python3.10 python3.10-distutils python-is-python3                  0.0s
+ => CACHED [ 6/15] RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1                                  0.0s
+ => CACHED [ 7/15] RUN update-alternatives --config python3                                                                          0.0s
+ => CACHED [ 8/15] RUN curl https://bootstrap.pypa.io/get-pip.py | python                                                            0.0s
+ => CACHED [ 9/15] RUN git clone https://github.com/Kwaai-AI-Lab/PAIAssistant.git                                                    0.0s
+ => CACHED [10/15] RUN cd PAIAssistant/web && npm install                                                                            0.0s
+ => CACHED [11/15] RUN pip install sentencepiece                                                                                     0.0s
+ => ERROR [12/15] RUN cd /PAIAssistant/api && pip install -r requirements.txt                                                      302.9s
+------
+ > [12/15] RUN cd /PAIAssistant/api && pip install -r requirements.txt:
+#16 0.905 Collecting gradio==4.7.1 (from -r requirements.txt (line 1))
+#16 1.002   Downloading gradio-4.7.1-py3-none-any.whl.metadata (17 kB)
+#16 1.173 Collecting langchain (from -r requirements.txt (line 2))
+#16 1.191   Downloading langchain-0.1.15-py3-none-any.whl.metadata (13 kB)
+#16 1.305 Collecting llama_index (from -r requirements.txt (line 3))
+#16 1.323   Downloading llama_index-0.10.28-py3-none-any.whl.metadata (11 kB)
+#16 1.368 Collecting jinja2==3.1.2 (from -r requirements.txt (line 4))
+#16 1.448   Downloading Jinja2-3.1.2-py3-none-any.whl.metadata (3.5 kB)
+#16 1.523 Collecting markupsafe==2.0.1 (from -r requirements.txt (line 5))
+#16 1.548   Downloading MarkupSafe-2.0.1-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl.metadata (3.2 kB)
+#16 1.615 Collecting torch (from -r requirements.txt (line 6))
+#16 1.634   Downloading torch-2.2.2-cp310-cp310-manylinux1_x86_64.whl.metadata (26 kB)
+#16 1.710 Collecting transformers (from -r requirements.txt (line 7))
+#16 1.727   Downloading transformers-4.39.3-py3-none-any.whl.metadata (134 kB)
+#16 1.752      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 134.8/134.8 kB 5.7 MB/s eta 0:00:00
+#16 1.803 Collecting llama-cpp-python (from -r requirements.txt (line 8))
+#16 1.821   Downloading llama_cpp_python-0.2.60.tar.gz (37.4 MB)
+#16 4.639      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 37.4/37.4 MB 12.5 MB/s eta 0:00:00
+#16 5.127   Installing build dependencies: started
+#16 6.365   Installing build dependencies: finished with status 'done'
+#16 6.366   Getting requirements to build wheel: started
+#16 6.438   Getting requirements to build wheel: finished with status 'done'
+#16 6.442   Installing backend dependencies: started
+#16 10.12   Installing backend dependencies: finished with status 'done'
+#16 10.12   Preparing metadata (pyproject.toml): started
+#16 10.26   Preparing metadata (pyproject.toml): finished with status 'done'
+#16 10.31 Collecting TTS (from -r requirements.txt (line 9))
+#16 10.33   Downloading TTS-0.22.0-cp310-cp310-manylinux1_x86_64.whl.metadata (21 kB)
+#16 10.37 Collecting simpleaudio (from -r requirements.txt (line 10))
+#16 10.39   Downloading simpleaudio-1.0.4.tar.gz (2.0 MB)
+#16 10.54      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 13.8 MB/s eta 0:00:00
+#16 10.57   Preparing metadata (setup.py): started
+#16 10.69   Preparing metadata (setup.py): finished with status 'done'
+#16 10.73 Collecting sentence-transformers (from -r requirements.txt (line 11))
+#16 10.81   Downloading sentence_transformers-2.6.1-py3-none-any.whl.metadata (11 kB)
+#16 10.84 Collecting docx2txt (from -r requirements.txt (line 12))
+#16 10.86   Downloading docx2txt-0.8.tar.gz (2.8 kB)
+#16 10.87   Preparing metadata (setup.py): started
+#16 10.98   Preparing metadata (setup.py): finished with status 'done'
+#16 11.02 Collecting pypdf (from -r requirements.txt (line 13))
+#16 11.04   Downloading pypdf-4.2.0-py3-none-any.whl.metadata (7.4 kB)
+#16 11.10 Collecting pyttsx3 (from -r requirements.txt (line 14))
+#16 11.12   Downloading pyttsx3-2.90-py3-none-any.whl.metadata (3.6 kB)
+#16 11.16 Collecting gtts (from -r requirements.txt (line 15))
+#16 11.18   Downloading gTTS-2.5.1-py3-none-any.whl.metadata (4.1 kB)
+#16 11.22 Collecting llama-index-readers-pdf-table (from -r requirements.txt (line 16))
+#16 11.24   Downloading llama_index_readers_pdf_table-0.1.3-py3-none-any.whl.metadata (1.6 kB)
+#16 11.29 Collecting llama-index-llms-langchain (from -r requirements.txt (line 17))
+#16 11.31   Downloading llama_index_llms_langchain-0.1.3-py3-none-any.whl.metadata (801 bytes)
+#16 11.35 Collecting llama-index-embeddings-huggingface (from -r requirements.txt (line 18))
+#16 11.37   Downloading llama_index_embeddings_huggingface-0.2.0-py3-none-any.whl.metadata (725 bytes)
+#16 11.42 Collecting aiofiles<24.0,>=22.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 11.44   Downloading aiofiles-23.2.1-py3-none-any.whl.metadata (9.7 kB)
+#16 11.48 Collecting altair<6.0,>=4.2.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 11.50   Downloading altair-5.3.0-py3-none-any.whl.metadata (9.2 kB)
+#16 11.59 Collecting fastapi (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 11.60   Downloading fastapi-0.110.1-py3-none-any.whl.metadata (24 kB)
+#16 11.64 Collecting ffmpy (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 11.66   Downloading ffmpy-0.3.2.tar.gz (5.5 kB)
+#16 11.67   Preparing metadata (setup.py): started
+#16 11.80   Preparing metadata (setup.py): finished with status 'done'
+#16 11.85 Collecting gradio-client==0.7.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 11.86   Downloading gradio_client-0.7.0-py3-none-any.whl.metadata (7.1 kB)
+#16 11.91 Collecting httpx (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 11.93   Downloading httpx-0.27.0-py3-none-any.whl.metadata (7.2 kB)
+#16 11.99 Collecting huggingface-hub>=0.14.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 12.01   Downloading huggingface_hub-0.22.2-py3-none-any.whl.metadata (12 kB)
+#16 12.08 Collecting importlib-resources<7.0,>=1.3 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 12.10   Downloading importlib_resources-6.4.0-py3-none-any.whl.metadata (3.9 kB)
+#16 12.26 Collecting matplotlib~=3.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 12.28   Downloading matplotlib-3.8.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.8 kB)
+#16 12.49 Collecting numpy~=1.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 12.51   Downloading numpy-1.26.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)
+#16 12.52      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.0/61.0 kB 6.9 MB/s eta 0:00:00
+#16 12.79 Collecting orjson~=3.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 12.81   Downloading orjson-3.10.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (49 kB)
+#16 12.82      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 49.5/49.5 kB 5.3 MB/s eta 0:00:00
+#16 12.86 Collecting packaging (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 12.86   Using cached packaging-24.0-py3-none-any.whl.metadata (3.2 kB)
+#16 13.01 Collecting pandas<3.0,>=1.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 13.03   Downloading pandas-2.2.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (19 kB)
+#16 13.25 Collecting pillow<11.0,>=8.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 13.27   Downloading pillow-10.3.0-cp310-cp310-manylinux_2_28_x86_64.whl.metadata (9.2 kB)
+#16 13.44 Collecting pydantic>=2.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 13.46   Downloading pydantic-2.6.4-py3-none-any.whl.metadata (85 kB)
+#16 13.47      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 85.1/85.1 kB 7.6 MB/s eta 0:00:00
+#16 13.51 Collecting pydub (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 13.53   Downloading pydub-0.25.1-py2.py3-none-any.whl.metadata (1.4 kB)
+#16 13.60 Collecting python-multipart (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 13.61   Downloading python_multipart-0.0.9-py3-none-any.whl.metadata (2.5 kB)
+#16 13.68 Collecting pyyaml<7.0,>=5.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 13.70   Downloading PyYAML-6.0.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+#16 13.71 Requirement already satisfied: requests~=2.0 in /usr/lib/python3/dist-packages (from gradio==4.7.1->-r requirements.txt (line 1)) (2.22.0)
+#16 13.74 Collecting semantic-version~=2.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 13.76   Downloading semantic_version-2.10.0-py2.py3-none-any.whl.metadata (9.7 kB)
+#16 13.81 Collecting tomlkit==0.12.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 13.83   Downloading tomlkit-0.12.0-py3-none-any.whl.metadata (2.7 kB)
+#16 13.88 Collecting typer<1.0,>=0.9 (from typer[all]<1.0,>=0.9->gradio==4.7.1->-r requirements.txt (line 1))
+#16 13.90   Downloading typer-0.12.3-py3-none-any.whl.metadata (15 kB)
+#16 13.95 Collecting typing-extensions~=4.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 13.97   Downloading typing_extensions-4.11.0-py3-none-any.whl.metadata (3.0 kB)
+#16 14.02 Collecting uvicorn>=0.14.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 14.04   Downloading uvicorn-0.29.0-py3-none-any.whl.metadata (6.3 kB)
+#16 14.10 Collecting fsspec (from gradio-client==0.7.0->gradio==4.7.1->-r requirements.txt (line 1))
+#16 14.12   Downloading fsspec-2024.3.1-py3-none-any.whl.metadata (6.8 kB)
+#16 14.22 Collecting websockets<12.0,>=10.0 (from gradio-client==0.7.0->gradio==4.7.1->-r requirements.txt (line 1))
+#16 14.23   Downloading websockets-11.0.3-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+#16 14.72 Collecting SQLAlchemy<3,>=1.4 (from langchain->-r requirements.txt (line 2))
+#16 14.74   Downloading SQLAlchemy-2.0.29-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.6 kB)
+#16 14.99 Collecting aiohttp<4.0.0,>=3.8.3 (from langchain->-r requirements.txt (line 2))
+#16 15.01   Downloading aiohttp-3.9.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.4 kB)
+#16 15.05 Collecting async-timeout<5.0.0,>=4.0.0 (from langchain->-r requirements.txt (line 2))
+#16 15.14   Downloading async_timeout-4.0.3-py3-none-any.whl.metadata (4.2 kB)
+#16 15.21 Collecting dataclasses-json<0.7,>=0.5.7 (from langchain->-r requirements.txt (line 2))
+#16 15.23   Downloading dataclasses_json-0.6.4-py3-none-any.whl.metadata (25 kB)
+#16 15.28 Collecting jsonpatch<2.0,>=1.33 (from langchain->-r requirements.txt (line 2))
+#16 15.30   Downloading jsonpatch-1.33-py2.py3-none-any.whl.metadata (3.0 kB)
+#16 15.34 Collecting langchain-community<0.1,>=0.0.32 (from langchain->-r requirements.txt (line 2))
+#16 15.36   Downloading langchain_community-0.0.32-py3-none-any.whl.metadata (8.5 kB)
+#16 15.42 Collecting langchain-core<0.2.0,>=0.1.41 (from langchain->-r requirements.txt (line 2))
+#16 15.44   Downloading langchain_core-0.1.41-py3-none-any.whl.metadata (5.9 kB)
+#16 15.48 Collecting langchain-text-splitters<0.1,>=0.0.1 (from langchain->-r requirements.txt (line 2))
+#16 15.51   Downloading langchain_text_splitters-0.0.1-py3-none-any.whl.metadata (2.0 kB)
+#16 15.60 Collecting langsmith<0.2.0,>=0.1.17 (from langchain->-r requirements.txt (line 2))
+#16 15.62   Downloading langsmith-0.1.42-py3-none-any.whl.metadata (13 kB)
+#16 15.69 Collecting tenacity<9.0.0,>=8.1.0 (from langchain->-r requirements.txt (line 2))
+#16 15.71   Downloading tenacity-8.2.3-py3-none-any.whl.metadata (1.0 kB)
+#16 15.76 Collecting llama-index-agent-openai<0.3.0,>=0.1.4 (from llama_index->-r requirements.txt (line 3))
+#16 15.78   Downloading llama_index_agent_openai-0.2.2-py3-none-any.whl.metadata (677 bytes)
+#16 15.83 Collecting llama-index-cli<0.2.0,>=0.1.2 (from llama_index->-r requirements.txt (line 3))
+#16 15.85   Downloading llama_index_cli-0.1.11-py3-none-any.whl.metadata (1.5 kB)
+#16 15.91 Collecting llama-index-core<0.11.0,>=0.10.28 (from llama_index->-r requirements.txt (line 3))
+#16 15.93   Downloading llama_index_core-0.10.28-py3-none-any.whl.metadata (3.6 kB)
+#16 15.97 Collecting llama-index-embeddings-openai<0.2.0,>=0.1.5 (from llama_index->-r requirements.txt (line 3))
+#16 15.99   Downloading llama_index_embeddings_openai-0.1.7-py3-none-any.whl.metadata (603 bytes)
+#16 16.02 Collecting llama-index-indices-managed-llama-cloud<0.2.0,>=0.1.2 (from llama_index->-r requirements.txt (line 3))
+#16 16.04   Downloading llama_index_indices_managed_llama_cloud-0.1.5-py3-none-any.whl.metadata (3.8 kB)
+#16 16.08 Collecting llama-index-legacy<0.10.0,>=0.9.48 (from llama_index->-r requirements.txt (line 3))
+#16 16.10   Downloading llama_index_legacy-0.9.48-py3-none-any.whl.metadata (8.5 kB)
+#16 16.14 Collecting llama-index-llms-openai<0.2.0,>=0.1.13 (from llama_index->-r requirements.txt (line 3))
+#16 16.16   Downloading llama_index_llms_openai-0.1.15-py3-none-any.whl.metadata (559 bytes)
+#16 16.20 Collecting llama-index-multi-modal-llms-openai<0.2.0,>=0.1.3 (from llama_index->-r requirements.txt (line 3))
+#16 16.22   Downloading llama_index_multi_modal_llms_openai-0.1.5-py3-none-any.whl.metadata (677 bytes)
+#16 16.26 Collecting llama-index-program-openai<0.2.0,>=0.1.3 (from llama_index->-r requirements.txt (line 3))
+#16 16.28   Downloading llama_index_program_openai-0.1.5-py3-none-any.whl.metadata (715 bytes)
+#16 16.32 Collecting llama-index-question-gen-openai<0.2.0,>=0.1.2 (from llama_index->-r requirements.txt (line 3))
+#16 16.34   Downloading llama_index_question_gen_openai-0.1.3-py3-none-any.whl.metadata (785 bytes)
+#16 16.38 Collecting llama-index-readers-file<0.2.0,>=0.1.4 (from llama_index->-r requirements.txt (line 3))
+#16 16.40   Downloading llama_index_readers_file-0.1.16-py3-none-any.whl.metadata (934 bytes)
+#16 16.44 Collecting llama-index-readers-llama-parse<0.2.0,>=0.1.2 (from llama_index->-r requirements.txt (line 3))
+#16 16.46   Downloading llama_index_readers_llama_parse-0.1.4-py3-none-any.whl.metadata (3.5 kB)
+#16 16.53 Collecting filelock (from torch->-r requirements.txt (line 6))
+#16 16.55   Downloading filelock-3.13.4-py3-none-any.whl.metadata (2.8 kB)
+#16 16.60 Collecting sympy (from torch->-r requirements.txt (line 6))
+#16 16.62   Downloading sympy-1.12-py3-none-any.whl.metadata (12 kB)
+#16 16.74 Collecting networkx (from torch->-r requirements.txt (line 6))
+#16 16.76   Downloading networkx-3.3-py3-none-any.whl.metadata (5.1 kB)
+#16 16.80 Collecting nvidia-cuda-nvrtc-cu12==12.1.105 (from torch->-r requirements.txt (line 6))
+#16 16.82   Downloading nvidia_cuda_nvrtc_cu12-12.1.105-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+#16 16.86 Collecting nvidia-cuda-runtime-cu12==12.1.105 (from torch->-r requirements.txt (line 6))
+#16 16.88   Downloading nvidia_cuda_runtime_cu12-12.1.105-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+#16 16.92 Collecting nvidia-cuda-cupti-cu12==12.1.105 (from torch->-r requirements.txt (line 6))
+#16 16.94   Downloading nvidia_cuda_cupti_cu12-12.1.105-py3-none-manylinux1_x86_64.whl.metadata (1.6 kB)
+#16 16.98 Collecting nvidia-cudnn-cu12==8.9.2.26 (from torch->-r requirements.txt (line 6))
+#16 17.00   Downloading nvidia_cudnn_cu12-8.9.2.26-py3-none-manylinux1_x86_64.whl.metadata (1.6 kB)
+#16 17.03 Collecting nvidia-cublas-cu12==12.1.3.1 (from torch->-r requirements.txt (line 6))
+#16 17.05   Downloading nvidia_cublas_cu12-12.1.3.1-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+#16 17.09 Collecting nvidia-cufft-cu12==11.0.2.54 (from torch->-r requirements.txt (line 6))
+#16 17.11   Downloading nvidia_cufft_cu12-11.0.2.54-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+#16 17.15 Collecting nvidia-curand-cu12==10.3.2.106 (from torch->-r requirements.txt (line 6))
+#16 17.17   Downloading nvidia_curand_cu12-10.3.2.106-py3-none-manylinux1_x86_64.whl.metadata (1.5 kB)
+#16 17.21 Collecting nvidia-cusolver-cu12==11.4.5.107 (from torch->-r requirements.txt (line 6))
+#16 17.23   Downloading nvidia_cusolver_cu12-11.4.5.107-py3-none-manylinux1_x86_64.whl.metadata (1.6 kB)
+#16 17.27 Collecting nvidia-cusparse-cu12==12.1.0.106 (from torch->-r requirements.txt (line 6))
+#16 17.30   Downloading nvidia_cusparse_cu12-12.1.0.106-py3-none-manylinux1_x86_64.whl.metadata (1.6 kB)
+#16 17.34 Collecting nvidia-nccl-cu12==2.19.3 (from torch->-r requirements.txt (line 6))
+#16 17.36   Downloading nvidia_nccl_cu12-2.19.3-py3-none-manylinux1_x86_64.whl.metadata (1.8 kB)
+#16 17.40 Collecting nvidia-nvtx-cu12==12.1.105 (from torch->-r requirements.txt (line 6))
+#16 17.42   Downloading nvidia_nvtx_cu12-12.1.105-py3-none-manylinux1_x86_64.whl.metadata (1.7 kB)
+#16 17.47 Collecting triton==2.2.0 (from torch->-r requirements.txt (line 6))
+#16 17.49   Downloading triton-2.2.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.4 kB)
+#16 17.56 Collecting nvidia-nvjitlink-cu12 (from nvidia-cusolver-cu12==11.4.5.107->torch->-r requirements.txt (line 6))
+#16 17.58   Downloading nvidia_nvjitlink_cu12-12.4.127-py3-none-manylinux2014_x86_64.whl.metadata (1.5 kB)
+#16 18.34 Collecting regex!=2019.12.17 (from transformers->-r requirements.txt (line 7))
+#16 18.37   Downloading regex-2023.12.25-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (40 kB)
+#16 18.37      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 40.9/40.9 kB 5.5 MB/s eta 0:00:00
+#16 18.65 Collecting tokenizers<0.19,>=0.14 (from transformers->-r requirements.txt (line 7))
+#16 18.68   Downloading tokenizers-0.15.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.7 kB)
+#16 18.82 Collecting safetensors>=0.4.1 (from transformers->-r requirements.txt (line 7))
+#16 18.84   Downloading safetensors-0.4.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.8 kB)
+#16 18.92 Collecting tqdm>=4.27 (from transformers->-r requirements.txt (line 7))
+#16 18.94   Downloading tqdm-4.66.2-py3-none-any.whl.metadata (57 kB)
+#16 18.95      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 57.6/57.6 kB 5.2 MB/s eta 0:00:00
+#16 19.09 Collecting diskcache>=5.6.1 (from llama-cpp-python->-r requirements.txt (line 8))
+#16 19.11   Downloading diskcache-5.6.3-py3-none-any.whl.metadata (20 kB)
+#16 19.43 Collecting cython>=0.29.30 (from TTS->-r requirements.txt (line 9))
+#16 19.45   Downloading Cython-3.0.10-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.2 kB)
+#16 19.61 Collecting scipy>=1.11.2 (from TTS->-r requirements.txt (line 9))
+#16 19.63   Downloading scipy-1.13.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (60 kB)
+#16 19.64      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 60.6/60.6 kB 6.5 MB/s eta 0:00:00
+#16 19.70 Collecting torchaudio (from TTS->-r requirements.txt (line 9))
+#16 19.72   Downloading torchaudio-2.2.2-cp310-cp310-manylinux1_x86_64.whl.metadata (6.4 kB)
+#16 19.76 Collecting soundfile>=0.12.0 (from TTS->-r requirements.txt (line 9))
+#16 19.78   Downloading soundfile-0.12.1-py2.py3-none-manylinux_2_31_x86_64.whl.metadata (14 kB)
+#16 19.82 Collecting librosa>=0.10.0 (from TTS->-r requirements.txt (line 9))
+#16 19.84   Downloading librosa-0.10.1-py3-none-any.whl.metadata (8.3 kB)
+#16 19.95 Collecting scikit-learn>=1.3.0 (from TTS->-r requirements.txt (line 9))
+#16 19.97   Downloading scikit_learn-1.4.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+#16 20.02 Collecting inflect>=5.6.0 (from TTS->-r requirements.txt (line 9))
+#16 20.04   Downloading inflect-7.2.0-py3-none-any.whl.metadata (21 kB)
+#16 20.09 Collecting anyascii>=0.3.0 (from TTS->-r requirements.txt (line 9))
+#16 20.11   Downloading anyascii-0.3.2-py3-none-any.whl.metadata (1.5 kB)
+#16 20.17 Collecting flask>=2.0.1 (from TTS->-r requirements.txt (line 9))
+#16 20.19   Downloading flask-3.0.3-py3-none-any.whl.metadata (3.2 kB)
+#16 20.23 Collecting pysbd>=0.3.4 (from TTS->-r requirements.txt (line 9))
+#16 20.25   Downloading pysbd-0.3.4-py3-none-any.whl.metadata (6.1 kB)
+#16 20.29 Collecting umap-learn>=0.5.1 (from TTS->-r requirements.txt (line 9))
+#16 20.31   Downloading umap_learn-0.5.6-py3-none-any.whl.metadata (21 kB)
+#16 20.33 Collecting pandas<3.0,>=1.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 20.35   Downloading pandas-1.5.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+#16 20.40 Collecting trainer>=0.0.32 (from TTS->-r requirements.txt (line 9))
+#16 20.42   Downloading trainer-0.0.36-py3-none-any.whl.metadata (8.1 kB)
+#16 20.46 Collecting coqpit>=0.0.16 (from TTS->-r requirements.txt (line 9))
+#16 20.52   Downloading coqpit-0.0.17-py3-none-any.whl.metadata (11 kB)
+#16 20.56 Collecting jieba (from TTS->-r requirements.txt (line 9))
+#16 20.58   Downloading jieba-0.42.1.tar.gz (19.2 MB)
+#16 22.04      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 19.2/19.2 MB 12.7 MB/s eta 0:00:00
+#16 22.36   Preparing metadata (setup.py): started
+#16 22.48   Preparing metadata (setup.py): finished with status 'done'
+#16 22.54 Collecting pypinyin (from TTS->-r requirements.txt (line 9))
+#16 22.56   Downloading pypinyin-0.51.0-py2.py3-none-any.whl.metadata (12 kB)
+#16 22.70 Collecting hangul-romanize (from TTS->-r requirements.txt (line 9))
+#16 22.71   Downloading hangul_romanize-0.1.0-py3-none-any.whl.metadata (1.2 kB)
+#16 22.75 Collecting gruut==2.2.3 (from gruut[de,es,fr]==2.2.3->TTS->-r requirements.txt (line 9))
+#16 22.77   Downloading gruut-2.2.3.tar.gz (73 kB)
+#16 22.78      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.5/73.5 kB 7.2 MB/s eta 0:00:00
+#16 22.80   Preparing metadata (setup.py): started
+#16 22.92   Preparing metadata (setup.py): finished with status 'done'
+#16 22.96 Collecting jamo (from TTS->-r requirements.txt (line 9))
+#16 22.98   Downloading jamo-0.4.1-py3-none-any.whl.metadata (2.3 kB)
+#16 23.03 Collecting nltk (from TTS->-r requirements.txt (line 9))
+#16 23.17   Downloading nltk-3.8.1-py3-none-any.whl.metadata (2.8 kB)
+#16 23.21 Collecting g2pkk>=0.1.1 (from TTS->-r requirements.txt (line 9))
+#16 23.24   Downloading g2pkk-0.1.2-py3-none-any.whl.metadata (2.0 kB)
+#16 23.27 Collecting bangla (from TTS->-r requirements.txt (line 9))
+#16 23.29   Downloading bangla-0.0.2-py2.py3-none-any.whl.metadata (4.5 kB)
+#16 23.33 Collecting bnnumerizer (from TTS->-r requirements.txt (line 9))
+#16 23.35   Downloading bnnumerizer-0.0.2.tar.gz (4.7 kB)
+#16 23.36   Preparing metadata (setup.py): started
+#16 23.47   Preparing metadata (setup.py): finished with status 'done'
+#16 23.50 Collecting bnunicodenormalizer (from TTS->-r requirements.txt (line 9))
+#16 23.52   Downloading bnunicodenormalizer-0.1.6.tar.gz (39 kB)
+#16 23.54   Preparing metadata (setup.py): started
+#16 23.65   Preparing metadata (setup.py): finished with status 'done'
+#16 23.68 Collecting einops>=0.6.0 (from TTS->-r requirements.txt (line 9))
+#16 23.70   Downloading einops-0.7.0-py3-none-any.whl.metadata (13 kB)
+#16 23.74 Collecting encodec>=0.1.1 (from TTS->-r requirements.txt (line 9))
+#16 23.76   Downloading encodec-0.1.1.tar.gz (3.7 MB)
+#16 24.06      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.7/3.7 MB 12.6 MB/s eta 0:00:00
+#16 24.11   Preparing metadata (setup.py): started
+#16 24.22   Preparing metadata (setup.py): finished with status 'done'
+#16 24.26 Collecting unidecode>=1.3.2 (from TTS->-r requirements.txt (line 9))
+#16 24.28   Downloading Unidecode-1.3.8-py3-none-any.whl.metadata (13 kB)
+#16 24.31 Collecting num2words (from TTS->-r requirements.txt (line 9))
+#16 24.33   Downloading num2words-0.5.13-py3-none-any.whl.metadata (12 kB)
+#16 24.60 Collecting spacy>=3 (from spacy[ja]>=3->TTS->-r requirements.txt (line 9))
+#16 24.62   Downloading spacy-3.7.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (27 kB)
+#16 24.65 Collecting numpy~=1.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 24.67   Downloading numpy-1.22.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.0 kB)
+#16 24.80 Collecting numba>=0.57.0 (from TTS->-r requirements.txt (line 9))
+#16 24.82   Downloading numba-0.59.1-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.7 kB)
+#16 24.88 Collecting Babel<3.0.0,>=2.8.0 (from gruut==2.2.3->gruut[de,es,fr]==2.2.3->TTS->-r requirements.txt (line 9))
+#16 24.90   Downloading Babel-2.14.0-py3-none-any.whl.metadata (1.6 kB)
+#16 24.94 Collecting dateparser~=1.1.0 (from gruut==2.2.3->gruut[de,es,fr]==2.2.3->TTS->-r requirements.txt (line 9))
+#16 24.96   Downloading dateparser-1.1.8-py2.py3-none-any.whl.metadata (27 kB)
+#16 25.00 Collecting gruut-ipa<1.0,>=0.12.0 (from gruut==2.2.3->gruut[de,es,fr]==2.2.3->TTS->-r requirements.txt (line 9))
+#16 25.02   Downloading gruut-ipa-0.13.0.tar.gz (101 kB)
+#16 25.03      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 101.6/101.6 kB 8.9 MB/s eta 0:00:00
+#16 25.06   Preparing metadata (setup.py): started
+#16 25.17   Preparing metadata (setup.py): finished with status 'done'
+#16 25.21 Collecting gruut_lang_en~=2.0.0 (from gruut==2.2.3->gruut[de,es,fr]==2.2.3->TTS->-r requirements.txt (line 9))
+#16 25.22   Downloading gruut_lang_en-2.0.0.tar.gz (15.2 MB)
+#16 26.64      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 15.2/15.2 MB 9.8 MB/s eta 0:00:00
+#16 26.95   Preparing metadata (setup.py): started
+#16 27.06   Preparing metadata (setup.py): finished with status 'done'
+#16 27.09 Collecting jsonlines~=1.2.0 (from gruut==2.2.3->gruut[de,es,fr]==2.2.3->TTS->-r requirements.txt (line 9))
+#16 27.11   Downloading jsonlines-1.2.0-py2.py3-none-any.whl.metadata (1.3 kB)
+#16 27.15 Collecting networkx (from torch->-r requirements.txt (line 6))
+#16 27.20   Downloading networkx-2.8.8-py3-none-any.whl.metadata (5.1 kB)
+#16 27.28 Collecting python-crfsuite~=0.9.7 (from gruut==2.2.3->gruut[de,es,fr]==2.2.3->TTS->-r requirements.txt (line 9))
+#16 27.30   Downloading python_crfsuite-0.9.10-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.2 kB)
+#16 27.34 Collecting gruut_lang_es~=2.0.0 (from gruut[de,es,fr]==2.2.3->TTS->-r requirements.txt (line 9))
+#16 27.36   Downloading gruut_lang_es-2.0.0.tar.gz (31.4 MB)
+#16 29.75      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 31.4/31.4 MB 12.4 MB/s eta 0:00:00
+#16 30.58   Preparing metadata (setup.py): started
+#16 30.69   Preparing metadata (setup.py): finished with status 'done'
+#16 30.72 Collecting gruut_lang_fr~=2.0.0 (from gruut[de,es,fr]==2.2.3->TTS->-r requirements.txt (line 9))
+#16 30.74   Downloading gruut_lang_fr-2.0.2.tar.gz (10.9 MB)
+#16 31.57      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.9/10.9 MB 13.2 MB/s eta 0:00:00
+#16 31.80   Preparing metadata (setup.py): started
+#16 31.91   Preparing metadata (setup.py): finished with status 'done'
+#16 31.94 Collecting gruut_lang_de~=2.0.0 (from gruut[de,es,fr]==2.2.3->TTS->-r requirements.txt (line 9))
+#16 31.96   Downloading gruut_lang_de-2.0.0.tar.gz (18.1 MB)
+#16 33.32      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.1/18.1 MB 13.1 MB/s eta 0:00:00
+#16 33.81   Preparing metadata (setup.py): started
+#16 33.92   Preparing metadata (setup.py): finished with status 'done'
+#16 34.06 Collecting requests~=2.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 34.08   Downloading requests-2.31.0-py3-none-any.whl.metadata (4.6 kB)
+#16 34.13 Collecting click<8.2,>=7.1 (from gtts->-r requirements.txt (line 15))
+#16 34.14   Downloading click-8.1.7-py3-none-any.whl.metadata (3.0 kB)
+#16 34.19 Collecting camelot-py<0.12.0,>=0.11.0 (from llama-index-readers-pdf-table->-r requirements.txt (line 16))
+#16 34.21   Downloading camelot_py-0.11.0-py3-none-any.whl.metadata (8.3 kB)
+#16 34.24 Collecting ghostscript<0.8,>=0.7 (from llama-index-readers-pdf-table->-r requirements.txt (line 16))
+#16 34.26   Downloading ghostscript-0.7-py2.py3-none-any.whl.metadata (4.4 kB)
+#16 34.38 Collecting opencv-python<5.0.0.0,>=4.9.0.80 (from llama-index-readers-pdf-table->-r requirements.txt (line 16))
+#16 34.40   Downloading opencv_python-4.9.0.80-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (20 kB)
+#16 34.47 Collecting llama-index-llms-anyscale<0.2.0,>=0.1.1 (from llama-index-llms-langchain->-r requirements.txt (line 17))
+#16 34.49   Downloading llama_index_llms_anyscale-0.1.3-py3-none-any.whl.metadata (698 bytes)
+#16 34.56 Collecting aiosignal>=1.1.2 (from aiohttp<4.0.0,>=3.8.3->langchain->-r requirements.txt (line 2))
+#16 34.58   Downloading aiosignal-1.3.1-py3-none-any.whl.metadata (4.0 kB)
+#16 34.62 Collecting attrs>=17.3.0 (from aiohttp<4.0.0,>=3.8.3->langchain->-r requirements.txt (line 2))
+#16 34.64   Downloading attrs-23.2.0-py3-none-any.whl.metadata (9.5 kB)
+#16 34.71 Collecting frozenlist>=1.1.1 (from aiohttp<4.0.0,>=3.8.3->langchain->-r requirements.txt (line 2))
+#16 34.73   Downloading frozenlist-1.4.1-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (12 kB)
+#16 34.93 Collecting multidict<7.0,>=4.5 (from aiohttp<4.0.0,>=3.8.3->langchain->-r requirements.txt (line 2))
+#16 34.94   Downloading multidict-6.0.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.2 kB)
+#16 35.08 Collecting yarl<2.0,>=1.0 (from aiohttp<4.0.0,>=3.8.3->langchain->-r requirements.txt (line 2))
+#16 35.10   Downloading yarl-1.9.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (31 kB)
+#16 35.19 Collecting jsonschema>=3.0 (from altair<6.0,>=4.2.0->gradio==4.7.1->-r requirements.txt (line 1))
+#16 35.21   Downloading jsonschema-4.21.1-py3-none-any.whl.metadata (7.8 kB)
+#16 35.26 Collecting toolz (from altair<6.0,>=4.2.0->gradio==4.7.1->-r requirements.txt (line 1))
+#16 35.28   Downloading toolz-0.12.1-py3-none-any.whl.metadata (5.1 kB)
+#16 35.33 Requirement already satisfied: chardet>=3.0.4 in /usr/lib/python3/dist-packages (from camelot-py<0.12.0,>=0.11.0->llama-index-readers-pdf-table->-r requirements.txt (line 16)) (3.0.4)
+#16 35.39 Collecting openpyxl>=2.5.8 (from camelot-py<0.12.0,>=0.11.0->llama-index-readers-pdf-table->-r requirements.txt (line 16))
+#16 35.41   Downloading openpyxl-3.1.2-py2.py3-none-any.whl.metadata (2.5 kB)
+#16 35.46 Collecting pdfminer.six>=20200726 (from camelot-py<0.12.0,>=0.11.0->llama-index-readers-pdf-table->-r requirements.txt (line 16))
+#16 35.48   Downloading pdfminer.six-20231228-py3-none-any.whl.metadata (4.2 kB)
+#16 35.52 Collecting tabulate>=0.8.9 (from camelot-py<0.12.0,>=0.11.0->llama-index-readers-pdf-table->-r requirements.txt (line 16))
+#16 35.54   Downloading tabulate-0.9.0-py3-none-any.whl.metadata (34 kB)
+#16 35.65 Collecting marshmallow<4.0.0,>=3.18.0 (from dataclasses-json<0.7,>=0.5.7->langchain->-r requirements.txt (line 2))
+#16 35.67   Downloading marshmallow-3.21.1-py3-none-any.whl.metadata (7.2 kB)
+#16 35.70 Collecting typing-inspect<1,>=0.4.0 (from dataclasses-json<0.7,>=0.5.7->langchain->-r requirements.txt (line 2))
+#16 35.72   Downloading typing_inspect-0.9.0-py3-none-any.whl.metadata (1.5 kB)
+#16 35.82 Collecting Werkzeug>=3.0.0 (from flask>=2.0.1->TTS->-r requirements.txt (line 9))
+#16 35.83   Downloading werkzeug-3.0.2-py3-none-any.whl.metadata (4.1 kB)
+#16 35.87 Collecting itsdangerous>=2.1.2 (from flask>=2.0.1->TTS->-r requirements.txt (line 9))
+#16 35.89   Downloading itsdangerous-2.1.2-py3-none-any.whl.metadata (2.9 kB)
+#16 35.93 Collecting blinker>=1.6.2 (from flask>=2.0.1->TTS->-r requirements.txt (line 9))
+#16 35.95   Downloading blinker-1.7.0-py3-none-any.whl.metadata (1.9 kB)
+#16 36.01 Requirement already satisfied: setuptools>=38.6.0 in /usr/local/lib/python3.10/dist-packages (from ghostscript<0.8,>=0.7->llama-index-readers-pdf-table->-r requirements.txt (line 16)) (69.2.0)
+#16 36.15 Collecting minijinja>=1.0 (from huggingface-hub[inference]>=0.19.0->llama-index-embeddings-huggingface->-r requirements.txt (line 18))
+#16 36.17   Downloading minijinja-1.0.16-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (8.5 kB)
+#16 36.25 Collecting more-itertools (from inflect>=5.6.0->TTS->-r requirements.txt (line 9))
+#16 36.27   Downloading more_itertools-10.2.0-py3-none-any.whl.metadata (34 kB)
+#16 36.32 Collecting typeguard>=4.0.1 (from inflect>=5.6.0->TTS->-r requirements.txt (line 9))
+#16 36.37   Downloading typeguard-4.2.1-py3-none-any.whl.metadata (3.7 kB)
+#16 36.42 Collecting jsonpointer>=1.9 (from jsonpatch<2.0,>=1.33->langchain->-r requirements.txt (line 2))
+#16 36.45   Downloading jsonpointer-2.4-py2.py3-none-any.whl.metadata (2.5 kB)
+#16 36.56 Collecting packaging (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 36.58   Downloading packaging-23.2-py3-none-any.whl.metadata (3.2 kB)
+#16 36.69 Collecting audioread>=2.1.9 (from librosa>=0.10.0->TTS->-r requirements.txt (line 9))
+#16 36.71   Downloading audioread-3.0.1-py3-none-any.whl.metadata (8.4 kB)
+#16 36.73 INFO: pip is looking at multiple versions of librosa to determine which version is compatible with other requirements. This could take a while.
+#16 36.73 Collecting librosa>=0.10.0 (from TTS->-r requirements.txt (line 9))
+#16 36.75   Downloading librosa-0.10.0.post2-py3-none-any.whl.metadata (8.3 kB)
+#16 36.80   Downloading librosa-0.10.0.post1-py3-none-any.whl.metadata (8.3 kB)
+#16 36.85   Downloading librosa-0.10.0-py3-none-any.whl.metadata (8.3 kB)
+#16 36.94 Collecting joblib>=0.14 (from librosa>=0.10.0->TTS->-r requirements.txt (line 9))
+#16 36.96   Downloading joblib-1.4.0-py3-none-any.whl.metadata (5.4 kB)
+#16 37.00 Collecting decorator>=4.3.0 (from librosa>=0.10.0->TTS->-r requirements.txt (line 9))
+#16 37.02   Downloading decorator-5.1.1-py3-none-any.whl.metadata (4.0 kB)
+#16 37.07 Collecting pooch>=1.0 (from librosa>=0.10.0->TTS->-r requirements.txt (line 9))
+#16 37.09   Downloading pooch-1.8.1-py3-none-any.whl.metadata (9.5 kB)
+#16 37.30 Collecting soxr>=0.3.2 (from librosa>=0.10.0->TTS->-r requirements.txt (line 9))
+#16 37.32   Downloading soxr-0.3.7-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.5 kB)
+#16 37.37 Collecting lazy-loader>=0.1 (from librosa>=0.10.0->TTS->-r requirements.txt (line 9))
+#16 37.38   Downloading lazy_loader-0.4-py3-none-any.whl.metadata (7.6 kB)
+#16 37.50 Collecting msgpack>=1.0 (from librosa>=0.10.0->TTS->-r requirements.txt (line 9))
+#16 37.52   Downloading msgpack-1.0.8-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.1 kB)
+#16 37.60 Collecting openai>=1.14.0 (from llama-index-agent-openai<0.3.0,>=0.1.4->llama_index->-r requirements.txt (line 3))
+#16 37.61   Downloading openai-1.16.2-py3-none-any.whl.metadata (21 kB)
+#16 37.74 Collecting deprecated>=1.2.9.3 (from llama-index-core<0.11.0,>=0.10.28->llama_index->-r requirements.txt (line 3))
+#16 37.76   Downloading Deprecated-1.2.14-py2.py3-none-any.whl.metadata (5.4 kB)
+#16 37.80 Collecting dirtyjson<2.0.0,>=1.0.8 (from llama-index-core<0.11.0,>=0.10.28->llama_index->-r requirements.txt (line 3))
+#16 37.82   Downloading dirtyjson-1.0.8-py3-none-any.whl.metadata (11 kB)
+#16 37.86 Collecting llamaindex-py-client<0.2.0,>=0.1.16 (from llama-index-core<0.11.0,>=0.10.28->llama_index->-r requirements.txt (line 3))
+#16 37.88   Downloading llamaindex_py_client-0.1.16-py3-none-any.whl.metadata (711 bytes)
+#16 37.93 Collecting nest-asyncio<2.0.0,>=1.5.8 (from llama-index-core<0.11.0,>=0.10.28->llama_index->-r requirements.txt (line 3))
+#16 37.95   Downloading nest_asyncio-1.6.0-py3-none-any.whl.metadata (2.8 kB)
+#16 37.96 INFO: pip is looking at multiple versions of llama-index-core to determine which version is compatible with other requirements. This could take a while.
+#16 37.96 Collecting llama-index-cli<0.2.0,>=0.1.2 (from llama_index->-r requirements.txt (line 3))
+#16 37.98   Downloading llama_index_cli-0.1.10-py3-none-any.whl.metadata (1.5 kB)
+#16 38.00 Collecting llama-index-agent-openai<0.3.0,>=0.1.4 (from llama_index->-r requirements.txt (line 3))
+#16 38.02   Downloading llama_index_agent_openai-0.2.1-py3-none-any.whl.metadata (644 bytes)
+#16 38.05 Collecting llama-index-embeddings-huggingface (from -r requirements.txt (line 18))
+#16 38.07   Downloading llama_index_embeddings_huggingface-0.1.5-py3-none-any.whl.metadata (755 bytes)
+#16 38.08 Collecting llama-index-llms-langchain (from -r requirements.txt (line 17))
+#16 38.10   Downloading llama_index_llms_langchain-0.1.2-py3-none-any.whl.metadata (751 bytes)
+#16 38.12 Collecting llama-index-readers-pdf-table (from -r requirements.txt (line 16))
+#16 38.14   Downloading llama_index_readers_pdf_table-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+#16 38.15 Collecting sentence-transformers (from -r requirements.txt (line 11))
+#16 38.17   Downloading sentence_transformers-2.6.0-py3-none-any.whl.metadata (11 kB)
+#16 38.19 Collecting TTS (from -r requirements.txt (line 9))
+#16 38.21   Downloading TTS-0.21.3-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 38.33 Collecting tiktoken>=0.3.3 (from llama-index-core<0.11.0,>=0.10.28->llama_index->-r requirements.txt (line 3))
+#16 38.34   Downloading tiktoken-0.6.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+#16 38.47 Collecting wrapt (from llama-index-core<0.11.0,>=0.10.28->llama_index->-r requirements.txt (line 3))
+#16 38.49   Downloading wrapt-1.16.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.6 kB)
+#16 38.56 INFO: pip is looking at multiple versions of gruut to determine which version is compatible with other requirements. This could take a while.
+#16 38.57 Collecting TTS (from -r requirements.txt (line 9))
+#16 38.59   Downloading TTS-0.21.2-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 38.65   Downloading TTS-0.21.1-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 38.72   Downloading TTS-0.21.0-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 38.78   Downloading TTS-0.20.6-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 38.85   Downloading TTS-0.20.5-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 38.90 Collecting cython==0.29.30 (from TTS->-r requirements.txt (line 9))
+#16 38.92   Downloading Cython-0.29.30-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl.metadata (2.8 kB)
+#16 38.93 Collecting scikit-learn==1.3.0 (from TTS->-r requirements.txt (line 9))
+#16 38.96   Downloading scikit_learn-1.3.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+#16 38.97 Collecting inflect==5.6.* (from TTS->-r requirements.txt (line 9))
+#16 38.99   Downloading inflect-5.6.2-py3-none-any.whl.metadata (21 kB)
+#16 39.01 INFO: pip is looking at multiple versions of tts to determine which version is compatible with other requirements. This could take a while.
+#16 39.01 Collecting TTS (from -r requirements.txt (line 9))
+#16 39.03   Downloading TTS-0.20.4-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.09   Downloading TTS-0.20.3-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.14   Downloading TTS-0.20.2-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.20   Downloading TTS-0.20.1-cp310-cp310-manylinux1_x86_64.whl.metadata (23 kB)
+#16 39.25   Downloading TTS-0.20.0-cp310-cp310-manylinux1_x86_64.whl.metadata (23 kB)
+#16 39.31   Downloading TTS-0.19.1-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.37   Downloading TTS-0.19.0-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.40 INFO: pip is still looking at multiple versions of tts to determine which version is compatible with other requirements. This could take a while.
+#16 39.42   Downloading TTS-0.18.2-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.48   Downloading TTS-0.18.1-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.53   Downloading TTS-0.18.0-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.59   Downloading TTS-0.17.10-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.65   Downloading TTS-0.17.9-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.68 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+#16 39.70   Downloading TTS-0.17.8-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.75   Downloading TTS-0.17.7-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.81   Downloading TTS-0.17.6-cp310-cp310-manylinux1_x86_64.whl.metadata (22 kB)
+#16 39.87   Downloading TTS-0.17.5-cp310-cp310-manylinux1_x86_64.whl.metadata (21 kB)
+#16 39.92   Downloading TTS-0.17.4-cp310-cp310-manylinux1_x86_64.whl.metadata (21 kB)
+#16 39.95 Collecting inflect==5.6.0 (from TTS->-r requirements.txt (line 9))
+#16 39.98   Downloading inflect-5.6.0-py3-none-any.whl.metadata (21 kB)
+#16 40.00 Collecting umap-learn==0.5.1 (from TTS->-r requirements.txt (line 9))
+#16 40.02   Downloading umap-learn-0.5.1.tar.gz (80 kB)
+#16 40.03      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 80.9/80.9 kB 7.9 MB/s eta 0:00:00
+#16 40.04   Preparing metadata (setup.py): started
+#16 40.15   Preparing metadata (setup.py): finished with status 'done'
+#16 40.16 Collecting bnunicodenormalizer==0.1.1 (from TTS->-r requirements.txt (line 9))
+#16 40.18   Downloading bnunicodenormalizer-0.1.1.tar.gz (38 kB)
+#16 40.19   Preparing metadata (setup.py): started
+#16 40.30   Preparing metadata (setup.py): finished with status 'done'
+#16 40.33 Collecting k-diffusion (from TTS->-r requirements.txt (line 9))
+#16 40.35   Downloading k_diffusion-0.1.1.post1-py3-none-any.whl.metadata (3.9 kB)
+#16 40.37 Collecting numba==0.57.0 (from TTS->-r requirements.txt (line 9))
+#16 40.39   Downloading numba-0.57.0-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.7 kB)
+#16 40.43 Collecting TTS (from -r requirements.txt (line 9))
+#16 40.46   Downloading TTS-0.17.2-cp310-cp310-manylinux1_x86_64.whl.metadata (21 kB)
+#16 40.55   Downloading TTS-0.17.1-cp310-cp310-manylinux1_x86_64.whl.metadata (21 kB)
+#16 40.58 INFO: pip is still looking at multiple versions of gruut to determine which version is compatible with other requirements. This could take a while.
+#16 40.64   Downloading TTS-0.17.0-cp310-cp310-manylinux1_x86_64.whl.metadata (21 kB)
+#16 40.73   Downloading TTS-0.16.6-cp310-cp310-manylinux1_x86_64.whl.metadata (21 kB)
+#16 40.82   Downloading TTS-0.16.5-cp310-cp310-manylinux1_x86_64.whl.metadata (21 kB)
+#16 40.91   Downloading TTS-0.16.4-cp310-cp310-manylinux1_x86_64.whl.metadata (21 kB)
+#16 41.00   Downloading TTS-0.16.3-cp310-cp310-manylinux1_x86_64.whl.metadata (21 kB)
+#16 41.03 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+#16 41.09   Downloading TTS-0.16.1-cp310-cp310-manylinux1_x86_64.whl.metadata (20 kB)
+#16 41.20   Downloading TTS-0.16.0-cp310-cp310-manylinux1_x86_64.whl.metadata (20 kB)
+#16 41.29   Downloading TTS-0.15.6-cp310-cp310-manylinux1_x86_64.whl.metadata (20 kB)
+#16 41.39 Collecting mecab-python3==1.0.6 (from TTS->-r requirements.txt (line 9))
+#16 41.41   Downloading mecab_python3-1.0.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.1 kB)
+#16 41.45 Collecting unidic-lite==1.0.8 (from TTS->-r requirements.txt (line 9))
+#16 41.47   Downloading unidic-lite-1.0.8.tar.gz (47.4 MB)
+#16 45.00      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 47.4/47.4 MB 12.3 MB/s eta 0:00:00
+#16 46.41   Preparing metadata (setup.py): started
+#16 46.52   Preparing metadata (setup.py): finished with status 'done'
+#16 46.56 Collecting TTS (from -r requirements.txt (line 9))
+#16 46.58   Downloading TTS-0.15.5-cp310-cp310-manylinux1_x86_64.whl.metadata (20 kB)
+#16 46.67   Downloading TTS-0.15.4-cp310-cp310-manylinux1_x86_64.whl.metadata (20 kB)
+#16 46.76   Downloading TTS-0.15.2-cp310-cp310-manylinux1_x86_64.whl.metadata (20 kB)
+#16 46.84   Downloading TTS-0.15.1-cp310-cp310-manylinux1_x86_64.whl.metadata (20 kB)
+#16 46.93   Downloading TTS-0.15.0-cp310-cp310-manylinux1_x86_64.whl.metadata (20 kB)
+#16 47.02   Downloading TTS-0.14.3-cp310-cp310-manylinux1_x86_64.whl.metadata (20 kB)
+#16 47.06 Collecting cython==0.29.28 (from TTS->-r requirements.txt (line 9))
+#16 47.08   Downloading Cython-0.29.28-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl.metadata (2.8 kB)
+#16 47.09 Collecting trainer==0.0.20 (from TTS->-r requirements.txt (line 9))
+#16 47.11   Downloading trainer-0.0.20-py3-none-any.whl.metadata (5.6 kB)
+#16 47.12 Collecting mecab-python3==1.0.5 (from TTS->-r requirements.txt (line 9))
+#16 47.15   Downloading mecab_python3-1.0.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.9 kB)
+#16 47.16 Collecting numba==0.56.4 (from TTS->-r requirements.txt (line 9))
+#16 47.18   Downloading numba-0.56.4-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.8 kB)
+#16 47.23 Collecting TTS (from -r requirements.txt (line 9))
+#16 47.25   Downloading TTS-0.14.2-cp310-cp310-manylinux1_x86_64.whl.metadata (20 kB)
+#16 47.34   Downloading TTS-0.14.0-cp310-cp310-manylinux1_x86_64.whl.metadata (19 kB)
+#16 47.43   Downloading TTS-0.13.3-cp310-cp310-manylinux1_x86_64.whl.metadata (19 kB)
+#16 47.51   Downloading TTS-0.13.2-cp310-cp310-manylinux1_x86_64.whl.metadata (19 kB)
+#16 47.60   Downloading TTS-0.13.1-cp310-cp310-manylinux1_x86_64.whl.metadata (19 kB)
+#16 47.69   Downloading TTS-0.13.0-cp310-cp310-manylinux1_x86_64.whl.metadata (18 kB)
+#16 47.72 Collecting librosa==0.8.0 (from TTS->-r requirements.txt (line 9))
+#16 47.74   Downloading librosa-0.8.0.tar.gz (183 kB)
+#16 47.76      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 183.9/183.9 kB 10.1 MB/s eta 0:00:00
+#16 47.77   Preparing metadata (setup.py): started
+#16 47.89   Preparing metadata (setup.py): finished with status 'done'
+#16 47.94 Collecting TTS (from -r requirements.txt (line 9))
+#16 47.95   Downloading TTS-0.12.0-cp310-cp310-manylinux1_x86_64.whl.metadata (17 kB)
+#16 47.99 Collecting numba==0.55.2 (from TTS->-r requirements.txt (line 9))
+#16 48.03   Downloading numba-0.55.2-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (3.3 kB)
+#16 48.08 Collecting TTS (from -r requirements.txt (line 9))
+#16 48.10   Downloading TTS-0.11.1-cp310-cp310-manylinux1_x86_64.whl.metadata (17 kB)
+#16 48.15 Collecting numpy~=1.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 48.16   Downloading numpy-1.22.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.0 kB)
+#16 48.21 Collecting TTS (from -r requirements.txt (line 9))
+#16 48.23   Downloading TTS-0.11.0-cp310-cp310-manylinux1_x86_64.whl.metadata (17 kB)
+#16 48.34   Downloading TTS-0.10.2-cp310-cp310-manylinux1_x86_64.whl.metadata (16 kB)
+#16 48.42   Downloading TTS-0.10.1-cp310-cp310-manylinux1_x86_64.whl.metadata (16 kB)
+#16 48.50   Downloading TTS-0.10.0-cp310-cp310-manylinux1_x86_64.whl.metadata (16 kB)
+#16 48.59   Downloading TTS-0.9.0-cp310-cp310-manylinux1_x86_64.whl.metadata (15 kB)
+#16 48.67   Downloading TTS-0.8.0-cp310-cp310-manylinux1_x86_64.whl.metadata (14 kB)
+#16 48.73 Collecting pyworld==0.2.10 (from TTS->-r requirements.txt (line 9))
+#16 48.75   Downloading pyworld-0.2.10.tar.gz (73 kB)
+#16 48.76      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 74.0/74.0 kB 7.0 MB/s eta 0:00:00
+#16 48.78   Preparing metadata (setup.py): started
+#16 51.59   Preparing metadata (setup.py): finished with status 'done'
+#16 51.64 Collecting TTS (from -r requirements.txt (line 9))
+#16 51.66   Downloading TTS-0.7.1.tar.gz (1.4 MB)
+#16 51.78      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.4/1.4 MB 12.2 MB/s eta 0:00:00
+#16 51.86   Installing build dependencies: started
+#16 56.59   Installing build dependencies: finished with status 'done'
+#16 56.59   Getting requirements to build wheel: started
+#16 57.95   Getting requirements to build wheel: finished with status 'done'
+#16 57.96   Preparing metadata (pyproject.toml): started
+#16 58.40   Preparing metadata (pyproject.toml): finished with status 'done'
+#16 58.43 Collecting numpy~=1.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 58.44   Using cached numpy-1.21.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+#16 58.45 Collecting numba==0.55.1 (from TTS->-r requirements.txt (line 9))
+#16 58.47   Downloading numba-0.55.1-1-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (3.3 kB)
+#16 58.55 Collecting TTS (from -r requirements.txt (line 9))
+#16 58.57   Downloading TTS-0.7.0.tar.gz (1.4 MB)
+#16 58.68      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.4/1.4 MB 12.6 MB/s eta 0:00:00
+#16 58.93   Installing build dependencies: started
+#16 62.32   Installing build dependencies: finished with status 'done'
+#16 62.32   Getting requirements to build wheel: started
+#16 63.50   Getting requirements to build wheel: finished with status 'done'
+#16 63.51   Preparing metadata (pyproject.toml): started
+#16 63.93   Preparing metadata (pyproject.toml): finished with status 'done'
+#16 63.99 Collecting transformers (from -r requirements.txt (line 7))
+#16 64.02   Downloading transformers-4.39.2-py3-none-any.whl.metadata (134 kB)
+#16 64.04      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 134.8/134.8 kB 7.8 MB/s eta 0:00:00
+#16 64.46 INFO: pip is still looking at multiple versions of llama-index-core to determine which version is compatible with other requirements. This could take a while.
+#16 65.90   Downloading transformers-4.39.1-py3-none-any.whl.metadata (134 kB)
+#16 65.91      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 134.8/134.8 kB 9.2 MB/s eta 0:00:00
+#16 67.74   Downloading transformers-4.39.0-py3-none-any.whl.metadata (134 kB)
+#16 67.76      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 134.8/134.8 kB 8.8 MB/s eta 0:00:00
+#16 69.61   Downloading transformers-4.38.2-py3-none-any.whl.metadata (130 kB)
+#16 69.63      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 130.7/130.7 kB 9.2 MB/s eta 0:00:00
+#16 71.62   Downloading transformers-4.38.1-py3-none-any.whl.metadata (131 kB)
+#16 71.66      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 131.1/131.1 kB 3.9 MB/s eta 0:00:00
+#16 73.47   Downloading transformers-4.38.0-py3-none-any.whl.metadata (131 kB)
+#16 73.48      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 131.1/131.1 kB 8.1 MB/s eta 0:00:00
+#16 73.87 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+#16 75.33   Downloading transformers-4.37.2-py3-none-any.whl.metadata (129 kB)
+#16 75.35      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 129.4/129.4 kB 7.4 MB/s eta 0:00:00
+#16 77.19   Downloading transformers-4.37.1-py3-none-any.whl.metadata (129 kB)
+#16 77.21      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 129.4/129.4 kB 8.3 MB/s eta 0:00:00
+#16 79.22   Downloading transformers-4.37.0-py3-none-any.whl.metadata (129 kB)
+#16 79.25      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 129.4/129.4 kB 5.5 MB/s eta 0:00:00
+#16 81.05   Downloading transformers-4.36.2-py3-none-any.whl.metadata (126 kB)
+#16 81.07      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 126.8/126.8 kB 7.5 MB/s eta 0:00:00
+#16 82.96   Downloading transformers-4.36.1-py3-none-any.whl.metadata (126 kB)
+#16 82.98      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 126.8/126.8 kB 7.3 MB/s eta 0:00:00
+#16 84.79   Downloading transformers-4.36.0-py3-none-any.whl.metadata (126 kB)
+#16 84.81      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 126.8/126.8 kB 7.5 MB/s eta 0:00:00
+#16 86.81   Downloading transformers-4.35.2-py3-none-any.whl.metadata (123 kB)
+#16 86.84      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 123.5/123.5 kB 5.0 MB/s eta 0:00:00
+#16 88.70   Downloading transformers-4.35.1-py3-none-any.whl.metadata (123 kB)
+#16 88.73      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 123.1/123.1 kB 3.5 MB/s eta 0:00:00
+#16 89.08 Collecting tokenizers<0.15,>=0.14 (from transformers->-r requirements.txt (line 7))
+#16 89.11   Downloading tokenizers-0.14.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.7 kB)
+#16 90.58 Collecting transformers (from -r requirements.txt (line 7))
+#16 90.60   Downloading transformers-4.35.0-py3-none-any.whl.metadata (123 kB)
+#16 90.61      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 123.1/123.1 kB 8.9 MB/s eta 0:00:00
+#16 92.42   Downloading transformers-4.34.1-py3-none-any.whl.metadata (121 kB)
+#16 92.43      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 121.5/121.5 kB 7.7 MB/s eta 0:00:00
+#16 94.44   Downloading transformers-4.34.0-py3-none-any.whl.metadata (121 kB)
+#16 94.46      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 121.5/121.5 kB 6.4 MB/s eta 0:00:00
+#16 96.32   Downloading transformers-4.33.3-py3-none-any.whl.metadata (119 kB)
+#16 96.33      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 119.9/119.9 kB 9.0 MB/s eta 0:00:00
+#16 96.68 Collecting tokenizers!=0.11.3,<0.14,>=0.11.1 (from transformers->-r requirements.txt (line 7))
+#16 96.70   Downloading tokenizers-0.13.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.7 kB)
+#16 98.17 Collecting transformers (from -r requirements.txt (line 7))
+#16 98.19   Downloading transformers-4.33.2-py3-none-any.whl.metadata (119 kB)
+#16 98.20      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 119.9/119.9 kB 7.8 MB/s eta 0:00:00
+#16 100.0   Downloading transformers-4.33.1-py3-none-any.whl.metadata (119 kB)
+#16 100.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 119.9/119.9 kB 9.0 MB/s eta 0:00:00
+#16 102.1   Downloading transformers-4.33.0-py3-none-any.whl.metadata (119 kB)
+#16 102.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 119.9/119.9 kB 8.8 MB/s eta 0:00:00
+#16 103.9   Downloading transformers-4.32.1-py3-none-any.whl.metadata (118 kB)
+#16 103.9      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 118.5/118.5 kB 8.5 MB/s eta 0:00:00
+#16 104.3 Collecting tqdm>=4.27 (from transformers->-r requirements.txt (line 7))
+#16 104.3   Downloading tqdm-4.64.1-py2.py3-none-any.whl.metadata (57 kB)
+#16 104.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 57.3/57.3 kB 5.0 MB/s eta 0:00:00
+#16 104.3 Collecting fsspec (from gradio-client==0.7.0->gradio==4.7.1->-r requirements.txt (line 1))
+#16 104.3   Downloading fsspec-2023.6.0-py3-none-any.whl.metadata (6.7 kB)
+#16 104.4 Collecting aiohttp<4.0.0,>=3.8.3 (from langchain->-r requirements.txt (line 2))
+#16 104.4   Downloading aiohttp-3.8.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.7 kB)
+#16 104.4 Collecting packaging (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 104.4   Downloading packaging-23.1-py3-none-any.whl.metadata (3.1 kB)
+#16 104.4 Collecting flask==2.* (from TTS->-r requirements.txt (line 9))
+#16 104.4   Downloading flask-2.3.3-py3-none-any.whl.metadata (3.6 kB)
+#16 104.5 Collecting matplotlib~=3.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 104.5   Downloading matplotlib-3.7.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.7 kB)
+#16 104.5 Collecting einops==0.6.* (from TTS->-r requirements.txt (line 9))
+#16 104.5   Downloading einops-0.6.1-py3-none-any.whl.metadata (12 kB)
+#16 104.6 Collecting pandas<3.0,>=1.0 (from gradio==4.7.1->-r requirements.txt (line 1))
+#16 104.6   Downloading pandas-1.4.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (12 kB)
+#16 104.8 Collecting llvmlite<0.41,>=0.40.0dev0 (from numba==0.57.0->TTS->-r requirements.txt (line 9))
+#16 104.9   Downloading llvmlite-0.40.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.7 kB)
+#16 104.9 Collecting pynndescent>=0.5 (from umap-learn==0.5.1->TTS->-r requirements.txt (line 9))
+#16 105.0   Downloading pynndescent-0.5.12-py3-none-any.whl.metadata (6.8 kB)
+#16 106.9 Collecting transformers (from -r requirements.txt (line 7))
+#16 106.9   Downloading transformers-4.32.0-py3-none-any.whl.metadata (118 kB)
+#16 106.9      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 118.5/118.5 kB 9.3 MB/s eta 0:00:00
+#16 109.4   Downloading transformers-4.31.0-py3-none-any.whl.metadata (116 kB)
+#16 109.5      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 116.9/116.9 kB 7.5 MB/s eta 0:00:00
+#16 110.2 INFO: pip is still looking at multiple versions of librosa to determine which version is compatible with other requirements. This could take a while.
+#16 112.2   Downloading transformers-4.30.2-py3-none-any.whl.metadata (113 kB)
+#16 112.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 113.6/113.6 kB 7.7 MB/s eta 0:00:00
+#16 114.8   Downloading transformers-4.30.1-py3-none-any.whl.metadata (113 kB)
+#16 114.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 113.6/113.6 kB 7.4 MB/s eta 0:00:00
+#16 115.3 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+#16 117.3   Downloading transformers-4.30.0-py3-none-any.whl.metadata (113 kB)
+#16 117.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 113.6/113.6 kB 8.9 MB/s eta 0:00:00
+#16 120.1   Downloading transformers-4.29.2-py3-none-any.whl.metadata (112 kB)
+#16 120.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 112.3/112.3 kB 6.5 MB/s eta 0:00:00
+#16 122.6   Downloading transformers-4.29.1-py3-none-any.whl.metadata (112 kB)
+#16 122.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 112.3/112.3 kB 7.5 MB/s eta 0:00:00
+#16 125.1   Downloading transformers-4.29.0-py3-none-any.whl.metadata (111 kB)
+#16 125.2      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 111.9/111.9 kB 8.6 MB/s eta 0:00:00
+#16 128.0   Downloading transformers-4.28.1-py3-none-any.whl.metadata (109 kB)
+#16 128.0      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 110.0/110.0 kB 7.6 MB/s eta 0:00:00
+#16 130.5   Downloading transformers-4.28.0-py3-none-any.whl.metadata (109 kB)
+#16 130.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 110.0/110.0 kB 7.4 MB/s eta 0:00:00
+#16 133.1   Downloading transformers-4.27.4-py3-none-any.whl.metadata (106 kB)
+#16 133.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 106.7/106.7 kB 7.4 MB/s eta 0:00:00
+#16 135.6   Downloading transformers-4.27.3-py3-none-any.whl.metadata (106 kB)
+#16 135.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 106.7/106.7 kB 8.3 MB/s eta 0:00:00
+#16 138.5   Downloading transformers-4.27.2-py3-none-any.whl.metadata (106 kB)
+#16 138.5      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 106.7/106.7 kB 7.3 MB/s eta 0:00:00
+#16 141.0   Downloading transformers-4.27.1-py3-none-any.whl.metadata (106 kB)
+#16 141.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 106.7/106.7 kB 7.2 MB/s eta 0:00:00
+#16 143.5   Downloading transformers-4.27.0-py3-none-any.whl.metadata (106 kB)
+#16 143.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 106.7/106.7 kB 7.5 MB/s eta 0:00:00
+#16 146.3   Downloading transformers-4.26.1-py3-none-any.whl.metadata (100 kB)
+#16 146.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100.3/100.3 kB 7.4 MB/s eta 0:00:00
+#16 148.8   Downloading transformers-4.26.0-py3-none-any.whl.metadata (100 kB)
+#16 148.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100.3/100.3 kB 8.0 MB/s eta 0:00:00
+#16 151.4   Downloading transformers-4.25.1-py3-none-any.whl.metadata (93 kB)
+#16 151.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 93.9/93.9 kB 7.6 MB/s eta 0:00:00
+#16 153.9   Downloading transformers-4.24.0-py3-none-any.whl.metadata (90 kB)
+#16 153.9      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 90.5/90.5 kB 7.4 MB/s eta 0:00:00
+#16 156.7   Downloading transformers-4.23.1-py3-none-any.whl.metadata (88 kB)
+#16 156.7      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 88.7/88.7 kB 7.2 MB/s eta 0:00:00
+#16 159.2   Downloading transformers-4.23.0-py3-none-any.whl.metadata (88 kB)
+#16 159.2      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 88.7/88.7 kB 7.0 MB/s eta 0:00:00
+#16 161.7   Downloading transformers-4.22.2-py3-none-any.whl.metadata (84 kB)
+#16 161.7      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 84.4/84.4 kB 6.8 MB/s eta 0:00:00
+#16 162.0 Collecting tokenizers!=0.11.3,<0.13,>=0.11.1 (from transformers->-r requirements.txt (line 7))
+#16 162.0   Downloading tokenizers-0.12.1-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl.metadata (6.5 kB)
+#16 164.2 Collecting transformers (from -r requirements.txt (line 7))
+#16 164.3   Downloading transformers-4.22.1-py3-none-any.whl.metadata (84 kB)
+#16 164.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 84.5/84.5 kB 7.1 MB/s eta 0:00:00
+#16 167.0   Downloading transformers-4.22.0-py3-none-any.whl.metadata (84 kB)
+#16 167.0      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 84.2/84.2 kB 6.9 MB/s eta 0:00:00
+#16 169.5   Downloading transformers-4.21.3-py3-none-any.whl.metadata (81 kB)
+#16 169.5      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 82.0/82.0 kB 6.7 MB/s eta 0:00:00
+#16 172.0   Downloading transformers-4.21.2-py3-none-any.whl.metadata (81 kB)
+#16 172.0      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 82.0/82.0 kB 8.3 MB/s eta 0:00:00
+#16 174.5   Downloading transformers-4.21.1-py3-none-any.whl.metadata (81 kB)
+#16 174.5      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 82.0/82.0 kB 7.0 MB/s eta 0:00:00
+#16 177.3   Downloading transformers-4.21.0-py3-none-any.whl.metadata (81 kB)
+#16 177.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 82.0/82.0 kB 6.5 MB/s eta 0:00:00
+#16 179.8   Downloading transformers-4.20.1-py3-none-any.whl.metadata (77 kB)
+#16 179.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 77.3/77.3 kB 6.1 MB/s eta 0:00:00
+#16 182.2   Downloading transformers-4.20.0-py3-none-any.whl.metadata (77 kB)
+#16 182.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 77.3/77.3 kB 5.8 MB/s eta 0:00:00
+#16 185.0   Downloading transformers-4.19.4-py3-none-any.whl.metadata (73 kB)
+#16 185.0      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.4/73.4 kB 5.4 MB/s eta 0:00:00
+#16 187.5   Downloading transformers-4.19.3-py3-none-any.whl.metadata (73 kB)
+#16 187.5      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.4/73.4 kB 6.3 MB/s eta 0:00:00
+#16 190.0   Downloading transformers-4.19.2-py3-none-any.whl.metadata (73 kB)
+#16 190.0      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.2/73.2 kB 6.9 MB/s eta 0:00:00
+#16 192.4   Downloading transformers-4.19.1-py3-none-any.whl.metadata (73 kB)
+#16 192.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.2/73.2 kB 5.6 MB/s eta 0:00:00
+#16 195.2   Downloading transformers-4.19.0-py3-none-any.whl.metadata (73 kB)
+#16 195.2      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.2/73.2 kB 6.6 MB/s eta 0:00:00
+#16 197.7   Downloading transformers-4.18.0-py3-none-any.whl.metadata (70 kB)
+#16 197.7      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 70.3/70.3 kB 5.7 MB/s eta 0:00:00
+#16 198.0 Collecting sacremoses (from transformers->-r requirements.txt (line 7))
+#16 198.0   Downloading sacremoses-0.1.1-py3-none-any.whl.metadata (8.3 kB)
+#16 200.2 Collecting transformers (from -r requirements.txt (line 7))
+#16 200.2   Downloading transformers-4.17.0-py3-none-any.whl.metadata (67 kB)
+#16 200.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 67.9/67.9 kB 5.7 MB/s eta 0:00:00
+#16 202.7   Downloading transformers-4.16.2-py3-none-any.whl.metadata (61 kB)
+#16 202.7      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.8/61.8 kB 5.6 MB/s eta 0:00:00
+#16 205.1   Downloading transformers-4.16.1-py3-none-any.whl.metadata (61 kB)
+#16 205.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.8/61.8 kB 5.8 MB/s eta 0:00:00
+#16 207.8   Downloading transformers-4.16.0-py3-none-any.whl.metadata (61 kB)
+#16 207.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.8/61.8 kB 5.9 MB/s eta 0:00:00
+#16 210.2   Downloading transformers-4.15.0-py3-none-any.whl.metadata (59 kB)
+#16 210.2      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 59.8/59.8 kB 6.0 MB/s eta 0:00:00
+#16 210.4 Collecting tokenizers<0.11,>=0.10.1 (from transformers->-r requirements.txt (line 7))
+#16 210.4   Downloading tokenizers-0.10.3.tar.gz (212 kB)
+#16 210.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 212.7/212.7 kB 8.7 MB/s eta 0:00:00
+#16 210.4   Installing build dependencies: started
+#16 212.0   Installing build dependencies: finished with status 'done'
+#16 212.0   Getting requirements to build wheel: started
+#16 212.1   Getting requirements to build wheel: finished with status 'done'
+#16 212.1   Preparing metadata (pyproject.toml): started
+#16 212.2   Preparing metadata (pyproject.toml): finished with status 'done'
+#16 214.5 Collecting transformers (from -r requirements.txt (line 7))
+#16 214.5   Downloading transformers-4.14.1-py3-none-any.whl.metadata (59 kB)
+#16 214.5      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 59.7/59.7 kB 5.4 MB/s eta 0:00:00
+#16 216.9   Downloading transformers-4.13.0-py3-none-any.whl.metadata (59 kB)
+#16 216.9      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 59.7/59.7 kB 4.4 MB/s eta 0:00:00
+#16 219.6   Downloading transformers-4.12.5-py3-none-any.whl.metadata (56 kB)
+#16 219.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.6/56.6 kB 5.0 MB/s eta 0:00:00
+#16 222.0   Downloading transformers-4.12.4-py3-none-any.whl.metadata (56 kB)
+#16 222.0      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.6/56.6 kB 5.2 MB/s eta 0:00:00
+#16 224.4   Downloading transformers-4.12.3-py3-none-any.whl.metadata (56 kB)
+#16 224.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.6/56.6 kB 5.0 MB/s eta 0:00:00
+#16 226.8   Downloading transformers-4.12.2-py3-none-any.whl.metadata (56 kB)
+#16 226.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.6/56.6 kB 5.7 MB/s eta 0:00:00
+#16 229.5   Downloading transformers-4.12.1-py3-none-any.whl.metadata (56 kB)
+#16 229.5      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.6/56.6 kB 5.8 MB/s eta 0:00:00
+#16 231.9   Downloading transformers-4.12.0-py3-none-any.whl.metadata (56 kB)
+#16 231.9      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.6/56.6 kB 4.9 MB/s eta 0:00:00
+#16 234.4   Downloading transformers-4.11.3-py3-none-any.whl.metadata (53 kB)
+#16 234.4      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 53.7/53.7 kB 4.0 MB/s eta 0:00:00
+#16 236.8   Downloading transformers-4.11.2-py3-none-any.whl.metadata (53 kB)
+#16 236.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 53.7/53.7 kB 2.4 MB/s eta 0:00:00
+#16 239.2   Downloading transformers-4.11.1-py3-none-any.whl.metadata (53 kB)
+#16 239.2      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 53.7/53.7 kB 5.5 MB/s eta 0:00:00
+#16 241.9   Downloading transformers-4.11.0-py3-none-any.whl.metadata (53 kB)
+#16 241.9      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 53.7/53.7 kB 6.4 MB/s eta 0:00:00
+#16 244.3   Downloading transformers-4.10.3-py3-none-any.whl.metadata (51 kB)
+#16 244.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.6/51.6 kB 5.2 MB/s eta 0:00:00
+#16 246.8   Downloading transformers-4.10.2-py3-none-any.whl.metadata (51 kB)
+#16 246.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.6/51.6 kB 4.7 MB/s eta 0:00:00
+#16 249.3   Downloading transformers-4.10.1-py3-none-any.whl.metadata (51 kB)
+#16 249.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.6/51.6 kB 4.6 MB/s eta 0:00:00
+#16 251.8   Downloading transformers-4.10.0-py3-none-any.whl.metadata (51 kB)
+#16 251.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 51.6/51.6 kB 4.9 MB/s eta 0:00:00
+#16 254.6   Downloading transformers-4.9.2-py3-none-any.whl.metadata (49 kB)
+#16 254.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 49.5/49.5 kB 4.6 MB/s eta 0:00:00
+#16 254.8 INFO: pip is looking at multiple versions of transformers to determine which version is compatible with other requirements. This could take a while.
+#16 254.8   Downloading transformers-4.9.1-py3-none-any.whl.metadata (49 kB)
+#16 254.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 49.5/49.5 kB 5.3 MB/s eta 0:00:00
+#16 255.0   Downloading transformers-4.9.0-py3-none-any.whl.metadata (49 kB)
+#16 255.0      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 49.5/49.5 kB 5.8 MB/s eta 0:00:00
+#16 255.2   Downloading transformers-4.8.2-py3-none-any.whl.metadata (48 kB)
+#16 255.2      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 48.8/48.8 kB 6.5 MB/s eta 0:00:00
+#16 255.3   Downloading transformers-4.8.1-py3-none-any.whl.metadata (48 kB)
+#16 255.3      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 48.8/48.8 kB 7.9 MB/s eta 0:00:00
+#16 255.6   Downloading transformers-4.8.0-py3-none-any.whl.metadata (48 kB)
+#16 255.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 48.8/48.8 kB 1.5 MB/s eta 0:00:00
+#16 255.7   Downloading transformers-4.7.0-py3-none-any.whl.metadata (48 kB)
+#16 255.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 48.3/48.3 kB 6.8 MB/s eta 0:00:00
+#16 255.9   Downloading transformers-4.6.1-py3-none-any.whl.metadata (45 kB)
+#16 255.9      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.4/45.4 kB 5.4 MB/s eta 0:00:00
+#16 256.0 INFO: pip is still looking at multiple versions of transformers to determine which version is compatible with other requirements. This could take a while.
+#16 256.1   Downloading transformers-4.6.0-py3-none-any.whl.metadata (45 kB)
+#16 256.1      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.4/45.4 kB 6.6 MB/s eta 0:00:00
+#16 256.2   Downloading transformers-4.5.1-py3-none-any.whl.metadata (41 kB)
+#16 256.2      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 41.0/41.0 kB 4.4 MB/s eta 0:00:00
+#16 258.6 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+#16 258.6   Downloading transformers-4.5.0-py3-none-any.whl.metadata (41 kB)
+#16 258.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 41.0/41.0 kB 4.2 MB/s eta 0:00:00
+#16 261.0   Downloading transformers-4.4.2-py3-none-any.whl.metadata (39 kB)
+#16 263.4   Downloading transformers-4.4.1-py3-none-any.whl.metadata (39 kB)
+#16 266.1   Downloading transformers-4.4.0-py3-none-any.whl.metadata (39 kB)
+#16 268.5   Downloading transformers-4.3.3-py3-none-any.whl.metadata (36 kB)
+#16 271.0   Downloading transformers-4.3.2-py3-none-any.whl.metadata (36 kB)
+#16 273.4   Downloading transformers-4.3.1-py3-none-any.whl.metadata (36 kB)
+#16 275.7   Downloading transformers-4.3.0-py3-none-any.whl.metadata (36 kB)
+#16 278.5   Downloading transformers-4.2.2-py3-none-any.whl.metadata (36 kB)
+#16 278.6 Collecting tokenizers==0.9.4 (from transformers->-r requirements.txt (line 7))
+#16 278.6   Downloading tokenizers-0.9.4.tar.gz (184 kB)
+#16 278.6      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 184.2/184.2 kB 10.5 MB/s eta 0:00:00
+#16 278.7   Installing build dependencies: started
+#16 280.2   Installing build dependencies: finished with status 'done'
+#16 280.2   Getting requirements to build wheel: started
+#16 280.3   Getting requirements to build wheel: finished with status 'done'
+#16 280.3   Preparing metadata (pyproject.toml): started
+#16 280.5   Preparing metadata (pyproject.toml): finished with status 'done'
+#16 282.9 Collecting transformers (from -r requirements.txt (line 7))
+#16 282.9   Downloading transformers-4.2.1-py3-none-any.whl.metadata (36 kB)
+#16 285.4   Downloading transformers-4.2.0-py3-none-any.whl.metadata (36 kB)
+#16 287.9   Downloading transformers-4.1.1-py3-none-any.whl.metadata (34 kB)
+#16 290.3   Downloading transformers-4.1.0-py3-none-any.whl.metadata (34 kB)
+#16 293.0   Downloading transformers-4.0.1-py3-none-any.whl.metadata (33 kB)
+#16 295.6   Downloading transformers-4.0.0-py3-none-any.whl.metadata (33 kB)
+#16 297.9   Downloading transformers-3.5.1-py3-none-any.whl.metadata (32 kB)
+#16 298.0 Collecting tokenizers==0.9.3 (from transformers->-r requirements.txt (line 7))
+#16 298.0   Downloading tokenizers-0.9.3.tar.gz (172 kB)
+#16 298.0      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 172.0/172.0 kB 10.1 MB/s eta 0:00:00
+#16 298.1   Installing build dependencies: started
+#16 299.4   Installing build dependencies: finished with status 'done'
+#16 299.4   Getting requirements to build wheel: started
+#16 299.5   Getting requirements to build wheel: finished with status 'done'
+#16 299.5   Preparing metadata (pyproject.toml): started
+#16 299.7   Preparing metadata (pyproject.toml): finished with status 'done'
+#16 299.8 Collecting sentencepiece==0.1.91 (from transformers->-r requirements.txt (line 7))
+#16 299.8   Downloading sentencepiece-0.1.91.tar.gz (500 kB)
+#16 299.8      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 500.5/500.5 kB 11.9 MB/s eta 0:00:00
+#16 299.9   Preparing metadata (setup.py): started
+#16 299.9   Preparing metadata (setup.py): finished with status 'error'
+#16 300.0   error: subprocess-exited-with-error
+#16 300.0
+#16 300.0   × python setup.py egg_info did not run successfully.
+#16 300.0   │ exit code: 1
+#16 300.0   ╰─> [5 lines of output]
+#16 300.0       Package sentencepiece was not found in the pkg-config search path.
+#16 300.0       Perhaps you should add the directory containing `sentencepiece.pc'
+#16 300.0       to the PKG_CONFIG_PATH environment variable
+#16 300.0       No package 'sentencepiece' found
+#16 300.0       Failed to find sentencepiece pkgconfig
+#16 300.0       [end of output]
+#16 300.0
+#16 300.0   note: This error originates from a subprocess, and is likely not a problem with pip.
+#16 300.0 error: metadata-generation-failed
+#16 300.0
+#16 300.0 × Encountered error while generating package metadata.
+#16 300.0 ╰─> See above for output.
+#16 300.0
+#16 300.0 note: This is an issue with the package mentioned above, not pip.
+#16 300.0 hint: See above for details.
+------
+executor failed running [/bin/sh -c cd /PAIAssistant/api && pip install -r requirements.txt]: exit code: 1
