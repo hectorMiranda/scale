@@ -1,0 +1,54 @@
+C:\kwaai\docker>docker build --no-cache --build-arg MAX_ROUNDS=1000000 -t paiassistant .
+[+] Building 644.6s (21/25)
+ => [internal] load build definition from Dockerfile                                                                                                    0.0s
+ => => transferring dockerfile: 2.72kB                                                                                                                  0.0s
+ => [internal] load .dockerignore                                                                                                                       0.0s
+ => => transferring context: 2B                                                                                                                         0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:20.04                                                                                         1.0s
+ => [auth] library/ubuntu:pull token for registry-1.docker.io                                                                                           0.0s
+ => CACHED [ 1/21] FROM docker.io/library/ubuntu:20.04@sha256:80ef4a44043dec4490506e6cc4289eeda2d106a70148b74b5ae91ee670e9c35d                          0.0s
+ => [ 2/21] RUN apt update && apt upgrade -y && apt-get update                                                                                         24.8s
+ => [ 3/21] RUN apt install -y --fix-missing net-tools software-properties-common curl git npm     libsndfile1 libasound2-dev ffmpeg pkg-config       375.7s
+ => [ 4/21] RUN add-apt-repository ppa:deadsnakes/ppa -y                                                                                                6.3s
+ => [ 5/21] RUN apt update && apt install -y --fix-missing python3-distutils python3.10 python3.10-distutils python-is-python3                         17.0s
+ => [ 6/21] RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1                                                            0.4s
+ => [ 7/21] RUN update-alternatives --config python3                                                                                                    0.5s
+ => [ 8/21] RUN curl https://bootstrap.pypa.io/get-pip.py | python3 && python3 -m pip install --upgrade pip                                             5.0s
+ => [ 9/21] RUN git clone https://github.com/Kwaai-AI-Lab/PAIAssistant.git                                                                             12.5s
+ => [10/21] RUN cd PAIAssistant/web && npm install                                                                                                      1.9s
+ => [11/21] RUN apt-get install -y libprotobuf-dev protobuf-compiler pkg-config                                                                         5.7s
+ => [12/21] RUN apt-get install -y git build-essential cmake libprotobuf-dev protobuf-compiler pkg-config                                               6.0s
+ => [13/21] RUN git clone https://github.com/google/sentencepiece.git                                                                                   7.1s
+ => [14/21] RUN cd sentencepiece &&     mkdir build &&     cd build &&     cmake .. &&     make -j $(nproc) &&     make install                        19.9s
+ => [15/21] RUN ldconfig -v                                                                                                                             0.4s
+ => [16/21] RUN pip install torch==1.13.1                                                                                                             158.8s
+ => ERROR [17/21] RUN pip install tensorrt-llm==0.7.1                                                                                                   1.2s
+------
+ > [17/21] RUN pip install tensorrt-llm==0.7.1:
+#21 0.942 Collecting tensorrt-llm==0.7.1
+#21 1.040   Downloading tensorrt-llm-0.7.1.tar.gz (6.9 kB)
+#21 1.051   Preparing metadata (setup.py): started
+#21 1.143   Preparing metadata (setup.py): finished with status 'error'
+#21 1.147   error: subprocess-exited-with-error
+#21 1.147
+#21 1.147   × python setup.py egg_info did not run successfully.
+#21 1.147   │ exit code: 1
+#21 1.147   ╰─> [6 lines of output]
+#21 1.147       Traceback (most recent call last):
+#21 1.147         File "<string>", line 2, in <module>
+#21 1.147         File "<pip-setuptools-caller>", line 34, in <module>
+#21 1.147         File "/tmp/pip-install-3onq3k8m/tensorrt-llm_09d126d0d7614c5b87f04cac3b592c87/setup.py", line 90, in <module>
+#21 1.147           raise RuntimeError("Bad params")
+#21 1.147       RuntimeError: Bad params
+#21 1.147       [end of output]
+#21 1.147
+#21 1.147   note: This error originates from a subprocess, and is likely not a problem with pip.
+#21 1.148 error: metadata-generation-failed
+#21 1.148
+#21 1.148 × Encountered error while generating package metadata.
+#21 1.148 ╰─> See above for output.
+#21 1.148
+#21 1.148 note: This is an issue with the package mentioned above, not pip.
+#21 1.148 hint: See above for details.
+------
+executor failed running [/bin/sh -c pip install tensorrt-llm==0.7.1]: exit code: 1
