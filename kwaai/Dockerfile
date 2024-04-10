@@ -13,7 +13,7 @@ RUN apt update && apt install -y --fix-missing python3-distutils python3.10 pyth
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
 RUN update-alternatives --config python3
 
-# Install pip for Python 3.10
+# Install pip for Python 3.10 and upgrade it to better handle dependencies (max round trips)
 #RUN curl https://bootstrap.pypa.io/get-pip.py | python3
 RUN curl https://bootstrap.pypa.io/get-pip.py | python3 && python3 -m pip install --upgrade pip
 
@@ -29,7 +29,6 @@ RUN apt-get install -y libprotobuf-dev protobuf-compiler pkg-config
 
 #RUN pip install sentencepiece
 
-#RUN apt-get install -y libprotobuf-dev protobuf-compiler pkg-config
 # Install prerequisites for building Sentencepiece
 RUN apt-get install -y git build-essential cmake libprotobuf-dev protobuf-compiler pkg-config
 
