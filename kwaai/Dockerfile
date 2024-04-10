@@ -9,8 +9,8 @@ RUN add-apt-repository ppa:deadsnakes/ppa -y
 
 
 # per google python version should be 3.10.11
-# RUN apt update && apt install -y --fix-missing python3-distutils python3.10 python3.10-distutils python-is-python3
-RUN apt update && apt install -y --fix-missing python3.10=3.10.11-1+bionic2 python3.10-distutils=3.10.11-1+bionic2 python-is-python3
+RUN apt update && apt install -y --fix-missing python3-distutils python3.10 python3.10-distutils python-is-python3
+#RUN apt update && apt install -y --fix-missing python3.10=3.10.11-1+bionic2 python3.10-distutils=3.10.11-1+bionic2 python-is-python3
 
 
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
@@ -56,7 +56,7 @@ ENV PIP_RESOLVER_MAX_ROUND_TRIPS=500000
 RUN pip install torch==1.13.1
 
 # Install tensorrt-llm package separately
-RUN pip install tensorrt-llm==0.7.1
+RUN pip install tensorrt-llm
 
 
 # Install Python dependencies for the API component
