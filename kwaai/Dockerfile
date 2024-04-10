@@ -14,13 +14,14 @@ RUN apt install -y net-tools software-properties-common curl git npm \
 # Add the deadsnakes PPA for Python 3.10
 RUN add-apt-repository ppa:deadsnakes/ppa -y
 
+# Install pip for Python 3.10
+RUN curl https://bootstrap.pypa.io/get-pip.py | python
+
 # Install Python 3.10 and set it as the default Python version
 RUN apt update && apt install -y --fix-missing python3.10 python3.10-distutils python-is-python3
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
 RUN update-alternatives --config python3
 
-# Install pip for Python 3.10
-RUN curl https://bootstrap.pypa.io/get-pip.py | python
 
 # Clone the PAIAssistant repository
 RUN git clone https://github.com/Kwaai-AI-Lab/PAIAssistant.git
@@ -28,13 +29,10 @@ RUN git clone https://github.com/Kwaai-AI-Lab/PAIAssistant.git
 # Install npm dependencies for the web component
 RUN cd PAIAssistant/web && npm install
 
-#adding underlying libraries for sentencepiece
-RUN apt-get install -y libprotobuf-dev protobuf-compiler
+# Install underlying libraries for sentencepiece
+RUN apt-get install -y libprotobuf-dev protobuf-compiler pkg-config
 
-#trying to resolve issue by installing sentencepiece directly from its wheel file
-#RUN pip install https://files.pythonhosted.org/packages/65/ae/e0e0b5b68362a0905f7d78348e82c3f3a68d4b4a21b5d6d00702a88f7b4c/sentencepiece-0.1.96-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl
 RUN pip install sentencepiece
-
 
 # Install Python dependencies for the API component
 RUN cd /PAIAssistant/api && pip install -r requirements.txt
