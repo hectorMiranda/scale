@@ -49,6 +49,11 @@ RUN ldconfig -v
 # Increase the pip resolution limit
 ENV PIP_RESOLVER_MAX_ROUND_TRIPS=500000
 
+#trying to install package separately
+RUN pip install torch==1.13.1
+
+
+
 # Install Python dependencies for the API component
 RUN cd /PAIAssistant/api && pip install -r requirements.txt
 
