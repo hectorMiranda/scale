@@ -56,7 +56,7 @@ RUN pip install torch==1.13.1
 #RUN pip install tensorrt-llm==0.7.1
 
 # trying lower version
-RUN pip install tensorrt-llm==0.7.0
+RUN pip install tensorrt-llm
 
 
 # Install Python dependencies for the API component
