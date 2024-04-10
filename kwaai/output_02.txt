@@ -1,0 +1,57 @@
+C:\kwaai\docker>docker build -t paiassistant .
+[+] Building 448.4s (9/18)
+ => [internal] load build definition from Dockerfile                                                                                 0.0s
+ => => transferring dockerfile: 1.85kB                                                                                               0.0s
+ => [internal] load .dockerignore                                                                                                    0.0s
+ => => transferring context: 2B                                                                                                      0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:20.04                                                                      0.9s
+ => [auth] library/ubuntu:pull token for registry-1.docker.io                                                                        0.0s
+ => [ 1/14] FROM docker.io/library/ubuntu:20.04@sha256:80ef4a44043dec4490506e6cc4289eeda2d106a70148b74b5ae91ee670e9c35d              0.0s
+ => CACHED [ 2/14] RUN apt update && apt upgrade -y && apt-get update                                                                0.0s
+ => [ 3/14] RUN apt install -y net-tools software-properties-common curl git npm     libsndfile1 libasound2-dev ffmpeg pkg-config  375.7s
+ => [ 4/14] RUN add-apt-repository ppa:deadsnakes/ppa -y                                                                             5.0s
+ => ERROR [ 5/14] RUN apt update && apt install -y python3.10 python3.10-distutils python-is-python3                                66.8s
+------
+ > [ 5/14] RUN apt update && apt install -y python3.10 python3.10-distutils python-is-python3:
+#9 0.410
+#9 0.410 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+#9 0.410
+#9 0.641 Hit:1 http://security.ubuntu.com/ubuntu focal-security InRelease
+#9 0.779 Hit:2 http://archive.ubuntu.com/ubuntu focal InRelease
+#9 0.779 Hit:3 http://ppa.launchpad.net/deadsnakes/ppa/ubuntu focal InRelease
+#9 1.076 Hit:4 http://archive.ubuntu.com/ubuntu focal-updates InRelease
+#9 1.382 Hit:5 http://archive.ubuntu.com/ubuntu focal-backports InRelease
+#9 1.458 Reading package lists...
+#9 2.133 Building dependency tree...
+#9 2.275 Reading state information...
+#9 2.284 All packages are up to date.
+#9 2.292
+#9 2.292 WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+#9 2.292
+#9 2.316 Reading package lists...
+#9 2.976 Building dependency tree...
+#9 3.119 Reading state information...
+#9 3.231 The following additional packages will be installed:
+#9 3.231   libpython3.10-minimal libpython3.10-stdlib python3.10-lib2to3
+#9 3.231   python3.10-minimal
+#9 3.232 Suggested packages:
+#9 3.232   python3.10-venv binfmt-support
+#9 3.255 The following NEW packages will be installed:
+#9 3.256   libpython3.10-minimal libpython3.10-stdlib python-is-python3 python3.10
+#9 3.256   python3.10-distutils python3.10-lib2to3 python3.10-minimal
+#9 3.801 0 upgraded, 7 newly installed, 0 to remove and 0 not upgraded.
+#9 3.801 Need to get 5533 kB of archives.
+#9 3.801 After this operation, 21.4 MB of additional disk space will be used.
+#9 3.801 Get:1 http://ppa.launchpad.net/deadsnakes/ppa/ubuntu focal/main amd64 libpython3.10-minimal amd64 3.10.14-1+focal1 [824 kB]
+#9 3.821 Get:2 http://archive.ubuntu.com/ubuntu focal/main amd64 python-is-python3 all 3.8.2-4 [2364 B]
+#9 5.978 Get:3 http://ppa.launchpad.net/deadsnakes/ppa/ubuntu focal/main amd64 python3.10-minimal amd64 3.10.14-1+focal1 [2077 kB]
+#9 11.21 Get:4 http://ppa.launchpad.net/deadsnakes/ppa/ubuntu focal/main amd64 libpython3.10-stdlib amd64 3.10.14-1+focal1 [1762 kB]
+#9 25.19 Get:5 http://ppa.launchpad.net/deadsnakes/ppa/ubuntu focal/main amd64 python3.10 amd64 3.10.14-1+focal1 [555 kB]
+#9 47.85 Err:6 http://ppa.launchpad.net/deadsnakes/ppa/ubuntu focal/main amd64 python3.10-lib2to3 all 3.10.14-1+focal1
+#9 47.85   403  connecting to ppa.launchpad.net:80: connecting to 185.125.190.80:80: dial tcp 185.125.190.80:80: connectex: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond. [IP: 185.125.190.80 80]
+#9 65.81 Get:7 http://ppa.launchpad.net/deadsnakes/ppa/ubuntu focal/main amd64 python3.10-distutils all 3.10.14-1+focal1 [187 kB]
+#9 66.81 E: Failed to fetch http://ppa.launchpad.net/deadsnakes/ppa/ubuntu/pool/main/p/python3.10/python3.10-lib2to3_3.10.14-1+focal1_all.deb  403  connecting to ppa.launchpad.net:80: connecting to 185.125.190.80:80: dial tcp 185.125.190.80:80: connectex: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond. [IP: 185.125.190.80 80]
+#9 66.81 E: Unable to fetch some archives, maybe run apt-get update or try with --fix-missing?
+#9 66.81 Fetched 5407 kB in 1min 4s (85.1 kB/s)
+------
+executor failed running [/bin/sh -c apt update && apt install -y python3.10 python3.10-distutils python-is-python3]: exit code: 100
