@@ -1,0 +1,96 @@
+C:\kwaai\docker>docker build -t paiassistant .
+[+] Building 0.1s (2/2) FINISHED
+ => [internal] load build definition from Dockerfile                                                                                                                                                                                                                               0.0s
+ => => transferring dockerfile: 2.37kB                                                                                                                                                                                                                                             0.0s
+ => [internal] load .dockerignore                                                                                                                                                                                                                                                  0.0s
+ => => transferring context: 2B                                                                                                                                                                                                                                                    0.0s
+failed to solve with frontend dockerfile.v0: failed to create LLB definition: dockerfile parse error line 40: unknown instruction: CD
+
+C:\kwaai\docker>docker build -t paiassistant .
+[+] Building 337.2s (18/22)
+ => CACHED [ 6/19] RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1                                                                                                                                                             0.0s                                                                                                                                                                                                                                                             => CACHED [ 7/19] RUN update-alternatives --config python3                                                                                                                                                                                                     0.0s                                                                                                                                                                                                                                                             => CACHED [ 8/19] RUN curl https://bootstrap.pypa.io/get-pip.py | pyth[+] Building 337.5s (18/22)
+ => [internal] load build definition from Dockerfile                                                                                                                                                                     0.0s  => CACHED [ 9/19] RUN git clone https://github.com/Kwaai-AI-Lab/PAIAssistant.git
+ => => transferring dockerfile: 2.66kB                                                                                                                                                                                   0.0s                                                                            => CACHED [10/19] RUN cd PAIAssistant/web && npm install
+ => [internal] load .dockerignore                                                                                                                                                                                        0.0s                                                                                                                                                      => CACHED [11/19] RUN apt-get install -y libprotobuf-dev protobuf-c
+ => => transferring context: 2B                                                                                                                                                                                          0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:20.04                                                                                                                                                          0.4s                                         6.4s
+ => [ 1/19] FROM docker.io/library/ubuntu:20.04@sha256:80ef4a44043dec4490506e6cc4289eeda2d106a70148b74b5ae91ee670e9c35d                                                                                                  0.0s                                                                                                                   7.1s
+ => CACHED [ 2/19] RUN apt update && apt upgrade -y && apt-get update                                                                                                                                                    0.0s &&     cmake .. &&     make -j $(nproc) &&     make install                                                                                                                                19.1s
+ => CACHED [ 3/19] RUN apt install -y net-tools software-properties-common curl git npm     libsndfile1 libasound2-dev ffmpeg pkg-config                                                                                 0.0s        => [15/19] RUN ldconfig -v
+ => CACHED [ 4/19] RUN add-apt-repository ppa:deadsnakes/ppa -y                                                                                                                                                          0.0s                                                                                  => [16/19] RUN cd /PAIAssistant/api && pip install -r requirements.txt
+ => CACHED [ 5/19] RUN apt update && apt install -y --fix-missing python3-distutils python3.10 python3.10-distutils python-is-python3                                                                                    0.0s                                                                                                                                                            => => #   Preparing metadata (setup.py): started
+ => CACHED [ 6/19] RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1                                                                                                                      0.0sta (setup.py): finished with status 'done'
+ => CACHED [ 7/19] RUN update-alternatives --config python3                                                                                                                                                              0.0s                                                => => #   Downloading protobuf-5.26.1-cp37-abi3-manylinux2014_x86_64.whl.metadata (592 bytes)
+ => CACHED [ 8/19] RUN curl https://bootstrap.pypa.io/get-pip.py | python3                                                                                                                                               0.0s                                                                                                                          => => #   Downloading transformers-3.5.0-py3-none-any.whl.metadata (32 kB)
+[+] Building 337.6s (18/22)
+ => [internal] load build definition from Dockerfile                                                                                                                                                             0.0s
+ => => transferring dockerfile: 2.66kB                                                                                                                                                                           0.0s
+ => [internal] load .dockerignore                                                                                                                                                                                0.0s
+ => => transferring context: 2B                                                                                                                                                                                  0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:20.04                                                                                                                                                  0.4s
+ => [ 1/19] FROM docker.io/library/ubuntu:20.04@sha256:80ef4a44043dec4490506e6cc4289eeda2d106a70148b74b5ae91ee670e9c35d                                                                                          0.0s
+ => CACHED [ 2/19] RUN apt update && apt upgrade -y && apt-get update                                                                                                                                            0.0s
+ => CACHED [ 3/19] RUN apt install -y net-tools software-properties-common curl git npm     libsndfile1 libasound2-dev ffmpeg pkg-config                                                                         0.0s
+ => CACHED [ 4/19] RUN add-apt-repository ppa:deadsnakes/ppa -y                                                                                                                                                  0.0s
+ => CACHED [ 5/19] RUN apt update && apt install -y --fix-missing python3-distutils python3.10 python3.10-distutils python-is-python3                                                                            0.0s
+[+] Building 337.9s (18/22)
+ => [internal] load build definition from Dockerfile                                                                                                                                                           0.0s
+ => => transferring dockerfile: 2.66kB                                                                                                                                                                         0.0s0
+ => [internal] load .dockerignore                                                                                                                                                                              0.0s
+ => => transferring context: 2B                                                                                                                                                                                0.0s0
+ => [internal] load metadata for docker.io/library/ubuntu:20.04                                                                                                                                                0.4s
+ => [ 1/19] FROM docker.io/library/ubuntu:20.04@sha256:80ef4a44043dec4490506e6cc4289eeda2d106a70148b74b5ae91ee670e9c35d                                                                                        0.0s0
+ => CACHED [ 2/19] RUN apt update && apt upgrade -y && apt-get update                                                                                                                                          0.0s
+ => CACHED [ 3/19] RUN apt install -y net-tools software-properties-common curl git npm     libsndfile1 libasound2-dev ffmpeg pkg-config                                                                       0.0s0
+ => CACHED [ 4/19] RUN add-apt-repository ppa:deadsnakes/ppa -y                                                                                                                                                0.0s
+ => CACHED [ 5/19] RUN apt update && apt install -y --fix-missing python3-distutils python3.10 python3.10-distutils python-is-python3                                                                          0.0s0
+[+] Building 338.0s (18/22)
+ => [internal] load build definition from Dockerfile                                                                                                                                                0.0s
+ => => transferring dockerfile: 2.66kB                                                                                                                                                              0.0s
+ => [internal] load .dockerignore                                                                                                                                                                   0.0s
+ => => transferring context: 2B                                                                                                                                                                     0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:20.04                                                                                                                                     0.4s
+ => [ 1/19] FROM docker.io/library/ubuntu:20.04@sha256:80ef4a44043dec4490506e6cc4289eeda2d106a70148b74b5ae91ee670e9c35d                                                                             0.0s
+ => CACHED [ 2/19] RUN apt update && apt upgrade -y && apt-get update                                                                                                                               0.0s
+ => CACHED [ 3/19] RUN apt install -y net-tools software-properties-common curl git npm     libsndfile1 libasound2-dev ffmpeg pkg-config                                                            0.0s
+ => CACHED [ 4/19] RUN add-apt-repository ppa:deadsnakes/ppa -y                                                                                                                                     0.0s
+ => CACHED [ 5/19] RUN apt update && apt install -y --fix-missing python3-distutils python3.10 python3.10-distutils python-is-python3                                                               0.0s
+ => CACHED [ 2/19] RUN apt update && apt upgrade -y && apt-get update                                                                                                       [+] Building 339.1s (18/22)
+ => [internal] load build definition from Dockerfile                                                                                                                   0.0s
+ => => transferring dockerfile: 2.66kB                                                                                                                                 0.0s
+ => [internal] load .dockerignore                                                                                                                                      0.0s
+ => => transferring context: 2B                                                                                                                                        0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:20.04                                                                                                        0.4s
+ => [ 1/19] FROM docker.io/library/ubuntu:20.04@sha256:80ef4a44043dec4490506e6cc4289eeda2d106a70148b74b5ae91ee670e9c35d                                                0.0s
+ => CACHED [ 2/19] RUN apt update && apt upgrade -y && apt-get update                                                                                                  0.0s
+ => CACHED [ 3/19] RUN apt install -y net-tools software-properties-common curl git npm     libsndfile1 libasound2-dev ffmpeg pkg-config                               0.0s
+ => CACHED [ 4/19] RUN add-apt-repository ppa:deadsnakes/ppa -y                                                                                                        0.0s
+ => CACHED [ 5/19] RUN apt update && apt install -y --fix-missing python3-distutils python3.10 python3.10-distutils python-is-python3                                  0.0s
+[+] Building 1068.4s (18/22)
+ => [internal] load build definition from Dockerfile                                                                                                    0.0s
+ => => transferring dockerfile: 2.66kB                                                                                                                  0.0s
+ => [internal] load .dockerignore                                                                                                                       0.0s
+ => => transferring context: 2B                                                                                                                         0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:20.04                                                                                         0.4s
+ => [ 1/19] FROM docker.io/library/ubuntu:20.04@sha256:80ef4a44043dec4490506e6cc4289eeda2d106a70148b74b5ae91ee670e9c35d                                 0.0s
+ => CACHED [ 2/19] RUN apt update && apt upgrade -y && apt-get update                                                                                   0.0s
+ => CACHED [ 3/19] RUN apt install -y net-tools software-properties-common curl git npm     libsndfile1 libasound2-dev ffmpeg pkg-config                0.0s
+ => CACHED [ 4/19] RUN add-apt-repository ppa:deadsnakes/ppa -y                                                                                         0.0s
+ => CACHED [ 5/19] RUN apt update && apt install -y --fix-missing python3-distutils python3.10 python3.10-distutils python-is-python3                   0.0s
+ => CACHED [ 6/19] RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1                                                     0.0s
+ => CACHED [ 7/19] RUN update-alternatives --config python3                                                                                             0.0s
+ => CACHED [ 8/19] RUN curl https://bootstrap.pypa.io/get-pip.py | python3                                                                              0.0s
+ => CACHED [ 9/19] RUN git clone https://github.com/Kwaai-AI-Lab/PAIAssistant.git                                                                       0.0s
+ => CACHED [10/19] RUN cd PAIAssistant/web && npm install                                                                                               0.0s
+ => CACHED [11/19] RUN apt-get install -y libprotobuf-dev protobuf-compiler pkg-config                                                                  0.0s
+ => [12/19] RUN apt-get install -y git build-essential cmake libprotobuf-dev protobuf-compiler pkg-config                                               6.4s
+ => [13/19] RUN git clone https://github.com/google/sentencepiece.git                                                                                   7.1s
+ => [14/19] RUN cd sentencepiece &&     mkdir build &&     cd build &&     cmake .. &&     make -j $(nproc) &&     make install                        19.1s
+ => [15/19] RUN ldconfig -v                                                                                                                             0.5s
+ => [16/19] RUN cd /PAIAssistant/api && pip install -r requirements.txt                                                                              1034.9s
+ => => #   Preparing metadata (pyproject.toml): finished with status 'done'
+ => => # Collecting torch (from -r requirements.txt (line 6))
+ => => #   Downloading torch-2.0.0-cp310-cp310-manylinux1_x86_64.whl.metadata (24 kB)
+ => => #   Downloading torch-1.13.1-cp310-cp310-manylinux1_x86_64.whl.metadata (24 kB)
+ => => # Collecting pytz>=2020.1 (from pandas<3.0,>=1.0->gradio==4.7.1->-r requirements.txt (line 1))
+ => => #   Downloading pytz-2024.1-py2.py3-none-any.whl.metadata (22 kB)
