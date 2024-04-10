@@ -1,0 +1,31 @@
+C:\kwaai\docker>docker build --no-cache --build-arg MAX_ROUNDS=1000000 -t paiassistant .
+[+] Building 1617.1s (20/24)
+ => [internal] load build definition from Dockerfile                                                                                                    0.0s
+ => => transferring dockerfile: 2.64kB                                                                                                                  0.0s
+ => [internal] load .dockerignore                                                                                                                       0.0s
+ => => transferring context: 2B                                                                                                                         0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:20.04                                                                                         0.9s
+ => [auth] library/ubuntu:pull token for registry-1.docker.io                                                                                           0.0s
+ => CACHED [ 1/20] FROM docker.io/library/ubuntu:20.04@sha256:80ef4a44043dec4490506e6cc4289eeda2d106a70148b74b5ae91ee670e9c35d                          0.0s
+ => [ 2/20] RUN apt update && apt upgrade -y && apt-get update                                                                                         29.8s
+ => [ 3/20] RUN apt install -y --fix-missing net-tools software-properties-common curl git npm     libsndfile1 libasound2-dev ffmpeg pkg-config       336.8s
+ => [ 4/20] RUN add-apt-repository ppa:deadsnakes/ppa -y                                                                                                4.7s
+ => [ 5/20] RUN apt update && apt install -y --fix-missing python3-distutils python3.10 python3.10-distutils python-is-python3                         18.3s
+ => [ 6/20] RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1                                                            0.4s
+ => [ 7/20] RUN update-alternatives --config python3                                                                                                    0.5s
+ => [ 8/20] RUN curl https://bootstrap.pypa.io/get-pip.py | python3 && python3 -m pip install --upgrade pip                                             5.0s
+ => [ 9/20] RUN git clone https://github.com/Kwaai-AI-Lab/PAIAssistant.git                                                                             11.3s
+ => [10/20] RUN cd PAIAssistant/web && npm install                                                                                                      2.0s
+ => [11/20] RUN apt-get install -y libprotobuf-dev protobuf-compiler pkg-config                                                                        11.1s
+ => [12/20] RUN apt-get install -y git build-essential cmake libprotobuf-dev protobuf-compiler pkg-config                                              18.8s
+ => [13/20] RUN git clone https://github.com/google/sentencepiece.git                                                                                   5.4s
+ => [14/20] RUN cd sentencepiece &&     mkdir build &&     cd build &&     cmake .. &&     make -j $(nproc) &&     make install                        18.8s
+ => [15/20] RUN ldconfig -v                                                                                                                             0.4s
+ => [16/20] RUN pip install torch==1.13.1                                                                                                             158.6s
+ => [17/20] RUN cd /PAIAssistant/api && pip install -r requirements.txt                                                                               994.0s
+ => => # INFO: pip is still looking at multiple versions of llama-index-embeddings-huggingface to determine which version is compatible with other requireme
+ => => # nts. This could take a while.
+ => => # INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://
+ => => # pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
+ => => # Collecting pytz>=2020.1 (from pandas<3.0,>=1.0->gradio==4.7.1->-r requirements.txt (line 1))
+ => => #   Downloading pytz-2024.1-py2.py3-none-any.whl.metadata (22 kB)
