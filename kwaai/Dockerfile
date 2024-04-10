@@ -52,6 +52,8 @@ ENV PIP_RESOLVER_MAX_ROUND_TRIPS=500000
 #trying to install package separately
 RUN pip install torch==1.13.1
 
+# Install tensorrt-llm package separately
+RUN pip install tensorrt-llm==0.7.1
 
 
 # Install Python dependencies for the API component
