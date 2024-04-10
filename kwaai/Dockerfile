@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt upgrade -y && apt-get update
-RUN apt install -y net-tools software-properties-common curl git npm \
+RUN apt install -y --fix-missing net-tools software-properties-common curl git npm \
     libsndfile1 libasound2-dev ffmpeg pkg-config
 
 # Add the deadsnakes PPA for Python 3.10
