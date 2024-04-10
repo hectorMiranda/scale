@@ -1,13 +1,6 @@
-# Use Ubuntu 20.04 as the base image
 FROM ubuntu:20.04
-
-# Set environment variables to avoid interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
-
-# Update and upgrade the system packages
 RUN apt update && apt upgrade -y && apt-get update
-
-# Install necessary packages
 RUN apt install -y net-tools software-properties-common curl git npm \
     libsndfile1 libasound2-dev ffmpeg pkg-config
 
@@ -21,7 +14,8 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
 RUN update-alternatives --config python3
 
 # Install pip for Python 3.10
-RUN curl https://bootstrap.pypa.io/get-pip.py | python3
+#RUN curl https://bootstrap.pypa.io/get-pip.py | python3
+RUN curl https://bootstrap.pypa.io/get-pip.py | python3 && python3 -m pip install --upgrade pip
 
 
 # Clone the PAIAssistant repository
@@ -53,6 +47,8 @@ RUN cd sentencepiece && \
 # Update shared library cache
 RUN ldconfig -v
 
+# Increase the pip resolution limit
+ENV PIP_RESOLVER_MAX_ROUND_TRIPS=500000
 
 # Install Python dependencies for the API component
 RUN cd /PAIAssistant/api && pip install -r requirements.txt
