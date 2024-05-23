@@ -1,0 +1,1 @@
+"""Individual PowerToy applications."""
