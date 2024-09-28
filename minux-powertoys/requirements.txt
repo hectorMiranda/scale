@@ -1,0 +1,6 @@
+# Core KeyboardMe needs only the Python standard library (tkinter + ctypes),
+# so the app runs with a bare python.org install and no pip step.
+#
+# These are OPTIONAL and only add the system-tray icon:
+pystray>=0.19
+Pillow>=10.0
