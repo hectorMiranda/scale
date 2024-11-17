@@ -1,0 +1,8 @@
+{
+  "name": "careful",
+  "wpm": 35,
+  "jitter": 0.4,
+  "word_pause_chance": 0.25,
+  "think_pause_chance": 0.02,
+  "description": "Slow and deliberate, lots of pauses."
+}
