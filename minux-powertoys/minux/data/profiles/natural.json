@@ -1,0 +1,8 @@
+{
+  "name": "natural",
+  "wpm": 70,
+  "jitter": 0.35,
+  "word_pause_chance": 0.18,
+  "think_pause_chance": 0.012,
+  "description": "Everyday typing rhythm."
+}
