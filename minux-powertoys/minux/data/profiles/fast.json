@@ -1,0 +1,8 @@
+{
+  "name": "fast",
+  "wpm": 110,
+  "jitter": 0.28,
+  "word_pause_chance": 0.14,
+  "think_pause_chance": 0.008,
+  "description": "Quick but still human."
+}
