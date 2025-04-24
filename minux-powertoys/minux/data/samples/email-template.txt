@@ -1,0 +1,7 @@
+Hi {name},
+
+Thanks for reaching out. I'll take a look and
+get back to you by end of day.
+
+Best,
+Hector
