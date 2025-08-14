@@ -1,0 +1,5 @@
+SELECT id, name, created_at
+FROM customers
+WHERE status = 'active'
+ORDER BY created_at DESC
+LIMIT 100;
