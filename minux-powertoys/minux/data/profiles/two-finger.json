@@ -1,0 +1,8 @@
+{
+  "name": "two-finger",
+  "wpm": 45,
+  "jitter": 0.55,
+  "word_pause_chance": 0.3,
+  "think_pause_chance": 0.02,
+  "description": "Hunt-and-peck: high variance."
+}
