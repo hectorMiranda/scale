@@ -1,0 +1,2 @@
+{"service": "minux", "enabled": true, "retries": 3,
+ "tags": ["powertoys", "keyboard"]}
