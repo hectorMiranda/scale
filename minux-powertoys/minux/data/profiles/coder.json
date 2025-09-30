@@ -1,0 +1,8 @@
+{
+  "name": "coder",
+  "wpm": 90,
+  "jitter": 0.3,
+  "word_pause_chance": 0.1,
+  "think_pause_chance": 0.01,
+  "description": "Steady, fewer word pauses, symbol-heavy."
+}
