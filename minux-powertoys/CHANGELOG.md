@@ -8,3 +8,6 @@
 - Added bundled sample texts.
 - Countdown before typing.
 
+## v0.1.2
+- Added typing profiles (careful, natural, fast, human-max).
+
