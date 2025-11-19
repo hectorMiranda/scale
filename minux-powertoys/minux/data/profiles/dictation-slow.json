@@ -1,0 +1,8 @@
+{
+  "name": "dictation-slow",
+  "wpm": 25,
+  "jitter": 0.45,
+  "word_pause_chance": 0.3,
+  "think_pause_chance": 0.03,
+  "description": "Transcribing while listening."
+}
