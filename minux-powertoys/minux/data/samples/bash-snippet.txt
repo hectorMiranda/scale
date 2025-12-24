@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+for f in *.log; do
+  echo "== $f =="
+  tail -n 20 "$f"
+done
