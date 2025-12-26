@@ -1,0 +1,8 @@
+{
+  "name": "legal",
+  "wpm": 40,
+  "jitter": 0.35,
+  "word_pause_chance": 0.22,
+  "think_pause_chance": 0.02,
+  "description": "Precise, careful, document work."
+}
