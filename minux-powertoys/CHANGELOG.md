@@ -11,3 +11,7 @@
 ## v0.1.2
 - Added typing profiles (careful, natural, fast, human-max).
 
+## v0.1.3
+- Panic stop: mouse-to-corner and Esc.
+- Docs for RDP/VM use.
+
