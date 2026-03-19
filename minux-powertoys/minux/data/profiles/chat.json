@@ -1,0 +1,8 @@
+{
+  "name": "chat",
+  "wpm": 95,
+  "jitter": 0.4,
+  "word_pause_chance": 0.16,
+  "think_pause_chance": 0.01,
+  "description": "Casual messaging cadence."
+}
