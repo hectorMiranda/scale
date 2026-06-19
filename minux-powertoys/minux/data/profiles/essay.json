@@ -1,0 +1,8 @@
+{
+  "name": "essay",
+  "wpm": 65,
+  "jitter": 0.33,
+  "word_pause_chance": 0.2,
+  "think_pause_chance": 0.015,
+  "description": "Composing prose, thinking pauses."
+}
