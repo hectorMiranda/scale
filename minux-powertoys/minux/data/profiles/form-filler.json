@@ -1,0 +1,8 @@
+{
+  "name": "form-filler",
+  "wpm": 55,
+  "jitter": 0.38,
+  "word_pause_chance": 0.24,
+  "think_pause_chance": 0.012,
+  "description": "Field-by-field data entry."
+}
