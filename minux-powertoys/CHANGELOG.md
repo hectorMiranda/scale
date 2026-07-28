@@ -15,3 +15,7 @@
 - Panic stop: mouse-to-corner and Esc.
 - Docs for RDP/VM use.
 
+## v0.1.4
+- More profiles and samples.
+- Minor README polish.
+
