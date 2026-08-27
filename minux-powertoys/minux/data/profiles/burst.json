@@ -1,0 +1,8 @@
+{
+  "name": "burst",
+  "wpm": 130,
+  "jitter": 0.25,
+  "word_pause_chance": 0.12,
+  "think_pause_chance": 0.006,
+  "description": "Short confident bursts."
+}
