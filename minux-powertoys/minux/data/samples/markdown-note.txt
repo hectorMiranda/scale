@@ -1,0 +1,5 @@
+# Notes
+
+- Remote Desktop blocks paste; type instead.
+- Keep it under human speed.
+- Esc aborts.
