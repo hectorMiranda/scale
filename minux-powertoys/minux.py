@@ -4,7 +4,7 @@
     python minux.py            # the Minux window (tabs) + tray icon
     python minux.py keyboardme # same window, KeyboardMe tab selected
 
-See README.md for setup. On Windows this is the file your shortcut / icon runs.
+On Windows this is the file your shortcut / icon runs.
 """
 
 import sys
