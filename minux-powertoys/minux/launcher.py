@@ -1,17 +1,18 @@
-"""Minux PowerToys launcher: a tray icon plus a window listing the tools.
+"""Minux PowerToys -- one window, a tab per tool, plus a system-tray icon.
 
-The Tk root created here owns the one and only mainloop. Tools open as Toplevel
-windows on it. A system-tray icon (pystray, optional) runs detached on a
-background thread; its menu posts actions into a thread-safe queue that the Tk
-loop drains, so all UI work still happens on the main thread.
+The Tk root created here owns the one and only mainloop. Each PowerToy builds its
+UI into a notebook tab. A tray icon (pystray, optional) runs alongside; its menu
+posts actions onto a thread-safe queue the Tk loop drains, so all UI work still
+happens on the main thread.
 
-If pystray/Pillow aren't installed, the launcher window alone is used -- the app
-still works, just without a tray icon.
+If pystray/Pillow aren't installed, the window alone is used and a banner says
+so (with the exact pip command). Nothing fails silently.
 """
 
 from __future__ import annotations
 
 import queue
+import sys
 from typing import Optional
 
 try:
@@ -25,81 +26,88 @@ from . import __version__
 
 _ACTIONS: "queue.Queue[tuple]" = queue.Queue()
 
+PURPLE = (124, 58, 237, 255)
+
 
 def _make_icon_image(size: int = 64):
-    """Build the Minux 'M' tile as a PIL image, or return None if PIL is absent."""
     try:
         from PIL import Image, ImageDraw
     except Exception:
         return None
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    purple = (124, 58, 237, 255)
-    d.rounded_rectangle([2, 2, size - 2, size - 2], radius=size // 6, fill=purple)
-    # A blocky white M.
     w = size
-    s = w * 0.18
-    pts_left = [(w * 0.26, w * 0.72), (w * 0.26, w * 0.28)]
-    d.line([(w * 0.26, w * 0.72), (w * 0.26, w * 0.28)], fill="white", width=int(s))
-    d.line([(w * 0.26, w * 0.30), (w * 0.50, w * 0.58)], fill="white", width=int(s))
-    d.line([(w * 0.50, w * 0.58), (w * 0.74, w * 0.30)], fill="white", width=int(s))
-    d.line([(w * 0.74, w * 0.28), (w * 0.74, w * 0.72)], fill="white", width=int(s))
+    d.rounded_rectangle([2, 2, w - 2, w - 2], radius=w // 6, fill=PURPLE)
+    s = int(w * 0.16)
+    d.line([(w * 0.26, w * 0.72), (w * 0.26, w * 0.28)], fill="white", width=s)
+    d.line([(w * 0.26, w * 0.30), (w * 0.50, w * 0.58)], fill="white", width=s)
+    d.line([(w * 0.50, w * 0.58), (w * 0.74, w * 0.30)], fill="white", width=s)
+    d.line([(w * 0.74, w * 0.28), (w * 0.74, w * 0.72)], fill="white", width=s)
     return img
 
 
-class Launcher:
+class MinuxApp:
     def __init__(self) -> None:
         if tk is None:
             raise RuntimeError("tkinter is not available in this Python build.")
         self.root = tk.Tk()
         self.root.title(f"Minux PowerToys {__version__}")
-        self.root.geometry("420x360")
+        self.root.geometry("600x620")
+        self.root.minsize(520, 560)
         self._tray = None
+        self._tray_error = ""
+        self._tabs = {}  # key -> tab index
         self._build_window()
+        self.root.protocol("WM_DELETE_WINDOW", self._on_window_close)
         self.root.after(80, self._drain_actions)
 
     def _build_window(self) -> None:
-        frame = ttk.Frame(self.root, padding=16)
-        frame.pack(fill="both", expand=True)
-
-        header = ttk.Frame(frame)
-        header.pack(fill="x", pady=(0, 12))
+        header = ttk.Frame(self.root, padding=(12, 10, 12, 0))
+        header.pack(fill="x")
         ttk.Label(header, text="Minux PowerToys", font=("", 15, "bold")).pack(side="left")
         ttk.Label(header, text=f"v{__version__}", foreground="#888").pack(side="right")
 
-        ttk.Label(frame, text="Pick a tool:").pack(anchor="w")
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(fill="both", expand=True, padx=12, pady=(8, 4))
+        for i, toy in enumerate(all_toys()):
+            tab = ttk.Frame(self.notebook)
+            self.notebook.add(tab, text=toy.name)
+            self._tabs[toy.key] = i
+            try:
+                toy.build(tab)
+            except Exception as exc:  # a broken tool shows an error, not a crash
+                ttk.Label(tab, text=f"{toy.name} failed to load:\n{exc}",
+                          foreground="#c00", padding=20).pack()
 
-        for toy in all_toys():
-            card = ttk.Frame(frame, padding=8, relief="groove")
-            card.pack(fill="x", pady=4)
-            left = ttk.Frame(card)
-            left.pack(side="left", fill="x", expand=True)
-            ttk.Label(left, text=toy.name, font=("", 11, "bold")).pack(anchor="w")
-            ttk.Label(left, text=toy.description, foreground="#666",
-                      wraplength=260, justify="left").pack(anchor="w")
-            ttk.Button(card, text="Open",
-                       command=lambda t=toy: self.open_toy(t.key)).pack(side="right")
+        # Tray status + retry (tray icons are easy to miss, so be explicit).
+        bar = ttk.Frame(self.root, padding=(12, 2, 12, 10))
+        bar.pack(fill="x", side="bottom")
+        self.tray_note = ttk.Label(bar, text="", wraplength=440, justify="left")
+        self.tray_note.pack(side="left", fill="x", expand=True)
+        self.retry_btn = ttk.Button(bar, text="Retry tray", command=self._retry_tray)
+        self.retry_btn.pack(side="right")
 
-        footer = ttk.Frame(frame)
-        footer.pack(fill="x", side="bottom", pady=(10, 0))
-        ttk.Button(footer, text="Quit", command=self.quit).pack(side="right")
+    # ----- actions from the tray ------------------------------------------- #
+    def select_tab(self, key: str) -> None:
+        if key in self._tabs:
+            self.notebook.select(self._tabs[key])
+        self._show_window()
 
-    # ----- actions --------------------------------------------------------- #
-    def open_toy(self, key: str) -> None:
-        for toy in all_toys():
-            if toy.key == key:
-                toy.open(self.root)
-                return
+    def _show_window(self) -> None:
+        self.root.deiconify()
+        self.root.lift()
+        self.root.focus_force()
 
     def _drain_actions(self) -> None:
         try:
             while True:
                 action = _ACTIONS.get_nowait()
                 if action[0] == "open":
-                    self.open_toy(action[1])
+                    self.select_tab(action[1])
                 elif action[0] == "show":
-                    self.root.deiconify()
-                    self.root.lift()
+                    self._show_window()
+                elif action[0] == "tray_failed":
+                    self._update_tray_note()
                 elif action[0] == "quit":
                     self.quit()
                     return
@@ -108,48 +116,93 @@ class Launcher:
         self.root.after(80, self._drain_actions)
 
     # ----- tray ------------------------------------------------------------ #
-    def start_tray(self) -> None:
+    def start_tray(self) -> bool:
         try:
             import pystray
-        except Exception:
-            return  # no tray; the window is enough
+        except Exception as exc:
+            self._tray_error = (f"Tray icon off ({exc.__class__.__name__}). "
+                                "Enable it with:  pip install pystray Pillow")
+            return False
         image = _make_icon_image()
         if image is None:
-            return
+            self._tray_error = "Tray icon off (Pillow missing). Run:  pip install pystray Pillow"
+            return False
 
-        def menu_items():
-            items = [
-                pystray.MenuItem(toy.name, (lambda k=toy.key: lambda *_: _ACTIONS.put(("open", k)))())
-                for toy in all_toys()
-            ]
-            items.append(pystray.MenuItem("Show launcher", lambda *_: _ACTIONS.put(("show",))))
-            items.append(pystray.MenuItem("Quit", lambda *_: _ACTIONS.put(("quit",))))
-            return pystray.Menu(*items)
+        def act(name, *extra):
+            return lambda *_: _ACTIONS.put((name, *extra))
 
-        self._tray = pystray.Icon("minux", image, "Minux PowerToys", menu_items())
+        items = [pystray.MenuItem("Show Minux", act("show"), default=True)]
+        for toy in all_toys():
+            items.append(pystray.MenuItem(toy.name, act("open", toy.key)))
+        items.append(pystray.Menu.SEPARATOR)
+        items.append(pystray.MenuItem("Quit", act("quit")))
+
+        self._tray = pystray.Icon("minux", image, "Minux PowerToys", pystray.Menu(*items))
+        # run_detached() is pystray's supported way to coexist with another GUI
+        # loop; fall back to a daemon thread if a backend can't detach.
         try:
             self._tray.run_detached()
         except Exception:
-            # Backend can't detach; fall back to a background thread.
             import threading
-            threading.Thread(target=self._tray.run, daemon=True).start()
+            threading.Thread(target=self._run_tray, daemon=True).start()
+        return True
+
+    def _run_tray(self) -> None:
+        try:
+            self._tray.run()
+        except Exception as exc:
+            self._tray = None
+            self._tray_error = f"Tray icon failed to start: {exc}"
+            _ACTIONS.put(("tray_failed",))
+
+    def _retry_tray(self) -> None:
+        if self._tray is not None:
+            return
+        self.start_tray()
+        self._update_tray_note()
+
+    def _update_tray_note(self) -> None:
+        if self._tray is not None:
+            self.tray_note.configure(
+                text="Tray icon active - if you don't see it, click the ^ arrow by the "
+                     "clock to show hidden icons and drag it onto the taskbar. "
+                     "Closing this window hides it to the tray.",
+                foreground="#060")
+            self.retry_btn.configure(state="disabled")
+        else:
+            self.tray_note.configure(text=self._tray_error, foreground="#a60")
+            self.retry_btn.configure(state="normal")
 
     # ----- lifecycle ------------------------------------------------------- #
+    def _on_window_close(self) -> None:
+        if self._tray is not None:
+            self.root.withdraw()  # hide to tray; Quit from the tray menu
+        else:
+            self.quit()
+
     def quit(self) -> None:
         if self._tray is not None:
             try:
                 self._tray.stop()
             except Exception:
                 pass
-        self.root.destroy()
+            self._tray = None
+        try:
+            self.root.destroy()
+        except Exception:
+            pass
 
     def run(self) -> None:
-        self.start_tray()
+        live = self.start_tray()
+        self._update_tray_note()
+        print("Minux PowerToys:",
+              "tray icon active (check the ^ overflow by the clock)." if live
+              else self._tray_error, file=sys.stderr)
         self.root.mainloop()
 
 
 def main() -> None:
-    Launcher().run()
+    MinuxApp().run()
 
 
 if __name__ == "__main__":
