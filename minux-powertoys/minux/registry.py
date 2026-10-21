@@ -16,15 +16,16 @@ class PowerToy:
     key: str
     name: str
     description: str
-    # build(parent_frame) -> constructs the tool's widgets inside the tab.
-    build: Callable[[Any], None]
+    # build(parent_frame) -> constructs the tool's widgets inside the tab and
+    # returns the panel (which may expose get_settings/apply_settings).
+    build: Callable[[Any], Any]
 
 
-def _build_keyboardme(parent: Any) -> None:
+def _build_keyboardme(parent: Any) -> Any:
     # Imported lazily so the window starts fast and a broken tool can't stop the
     # others from loading.
     from .apps.keyboardme import build_panel
-    build_panel(parent)
+    return build_panel(parent)
 
 
 def all_toys() -> List[PowerToy]:

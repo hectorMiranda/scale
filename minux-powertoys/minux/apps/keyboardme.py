@@ -52,7 +52,7 @@ class KeyboardMePanel(_Base):
 
     # ----- UI -------------------------------------------------------------- #
     def _build_ui(self) -> None:
-        ttk.Label(self, text="Text to type", font=("", 11, "bold")).pack(anchor="w")
+        ttk.Label(self, text="Text to type", font="MinuxHeading").pack(anchor="w")
         self.text = tk.Text(self, height=8, wrap="word")
         self.text.pack(fill="both", expand=True, pady=(2, 8))
         self.text.focus_set()
@@ -108,7 +108,7 @@ class KeyboardMePanel(_Base):
         self.stop_btn.pack(side="left", padx=6)
 
         # Big, unmissable countdown / typing banner (window stays visible).
-        self.banner = tk.Label(self, text="", font=("", 26, "bold"), fg="#7c3aee")
+        self.banner = tk.Label(self, text="", font="MinuxBanner", fg="#7c3aee")
         self.banner.pack(fill="x", pady=(2, 2))
         self.progress = ttk.Progressbar(self, mode="determinate")
         self.progress.pack(fill="x", pady=(2, 2))
@@ -161,6 +161,38 @@ class KeyboardMePanel(_Base):
         self.status.configure(
             text=f"{n} chars - est. {_fmt_duration(plan.total_seconds)} - "
                  f"peak {plan.peak_wpm():.0f} WPM (cap {MAX_HUMAN_WPM})")
+
+    # ----- settings persistence ------------------------------------------- #
+    def get_settings(self) -> dict:
+        return {
+            "mode": self.mode.get(),
+            "wpm": self._current_wpm(),
+            "duration_min": float(self.duration_min.get()),
+            "countdown": int(self.countdown.get()),
+            "add_typos": bool(self.add_typos.get()),
+            "corner_panic": bool(self.corner_panic.get()),
+        }
+
+    def apply_settings(self, d: dict) -> None:
+        if not isinstance(d, dict):
+            return
+        try:
+            if "mode" in d:
+                self.mode.set(d["mode"])
+            if "wpm" in d:
+                self.wpm_scale.set(float(d["wpm"]))
+            if "duration_min" in d:
+                self.duration_min.set(float(d["duration_min"]))
+            if "countdown" in d:
+                self.countdown.set(int(d["countdown"]))
+            if "add_typos" in d:
+                self.add_typos.set(bool(d["add_typos"]))
+            if "corner_panic" in d:
+                self.corner_panic.set(bool(d["corner_panic"]))
+        except Exception:
+            pass
+        self._sync_mode()
+        self._refresh_estimate()
 
     # ----- run / stop ------------------------------------------------------ #
     def _start(self) -> None:

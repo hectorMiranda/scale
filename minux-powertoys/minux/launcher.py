@@ -22,7 +22,8 @@ except Exception:  # pragma: no cover
     tk = None  # type: ignore
 
 from .registry import all_toys
-from . import __version__
+from . import __version__, config
+from .ui import FontScaler, enable_dpi_awareness
 
 _ACTIONS: "queue.Queue[tuple]" = queue.Queue()
 
@@ -52,20 +53,33 @@ class MinuxApp:
             raise RuntimeError("tkinter is not available in this Python build.")
         self.root = tk.Tk()
         self.root.title(f"Minux PowerToys {__version__}")
-        self.root.geometry("600x620")
+        self.root.geometry("640x660")
         self.root.minsize(520, 560)
         self._tray = None
         self._tray_error = ""
-        self._tabs = {}  # key -> tab index
+        self._tabs = {}     # key -> tab index
+        self._panels = {}   # key -> built panel (for settings)
+        self._settings = config.load()
+        self._scaler = FontScaler(self.root)
+        self._scaler.apply(float(self._settings.get("font_scale", 1.0)))
         self._build_window()
+        self._restore_panel_settings()
         self.root.protocol("WM_DELETE_WINDOW", self._on_window_close)
         self.root.after(80, self._drain_actions)
 
     def _build_window(self) -> None:
         header = ttk.Frame(self.root, padding=(12, 10, 12, 0))
         header.pack(fill="x")
-        ttk.Label(header, text="Minux PowerToys", font=("", 15, "bold")).pack(side="left")
-        ttk.Label(header, text=f"v{__version__}", foreground="#888").pack(side="right")
+        ttk.Label(header, text="Minux PowerToys", font="MinuxTitle").pack(side="left")
+
+        # Text-size controls (scale the whole UI live; remembered across launches).
+        ttk.Label(header, text=f"v{__version__}", foreground="#888").pack(side="right", padx=(8, 0))
+        ttk.Button(header, text="A+", width=3, command=lambda: self._zoom(+0.1)).pack(side="right", padx=1)
+        self._scale_lbl = ttk.Label(header, width=5, anchor="center",
+                                    text=f"{self._scaler.percent()}%")
+        self._scale_lbl.pack(side="right")
+        ttk.Button(header, text="A−", width=3, command=lambda: self._zoom(-0.1)).pack(side="right", padx=1)
+        ttk.Label(header, text="Text size:", foreground="#888").pack(side="right", padx=(0, 4))
 
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill="both", expand=True, padx=12, pady=(8, 4))
@@ -74,7 +88,7 @@ class MinuxApp:
             self.notebook.add(tab, text=toy.name)
             self._tabs[toy.key] = i
             try:
-                toy.build(tab)
+                self._panels[toy.key] = toy.build(tab)
             except Exception as exc:  # a broken tool shows an error, not a crash
                 ttk.Label(tab, text=f"{toy.name} failed to load:\n{exc}",
                           foreground="#c00", padding=20).pack()
@@ -173,14 +187,46 @@ class MinuxApp:
             self.tray_note.configure(text=self._tray_error, foreground="#a60")
             self.retry_btn.configure(state="normal")
 
+    # ----- settings / zoom ------------------------------------------------- #
+    def _zoom(self, delta: float) -> None:
+        self._scaler.step(delta)
+        self._scale_lbl.configure(text=f"{self._scaler.percent()}%")
+        self._save()
+
+    def _restore_panel_settings(self) -> None:
+        for key, panel in self._panels.items():
+            data = self._settings.get(key)
+            if data and hasattr(panel, "apply_settings"):
+                try:
+                    panel.apply_settings(data)
+                except Exception:
+                    pass
+
+    def _collect_settings(self) -> dict:
+        data = dict(self._settings)
+        data["font_scale"] = round(self._scaler.scale, 3)
+        for key, panel in self._panels.items():
+            if hasattr(panel, "get_settings"):
+                try:
+                    data[key] = panel.get_settings()
+                except Exception:
+                    pass
+        self._settings = data
+        return data
+
+    def _save(self) -> None:
+        config.save(self._collect_settings())
+
     # ----- lifecycle ------------------------------------------------------- #
     def _on_window_close(self) -> None:
+        self._save()
         if self._tray is not None:
             self.root.withdraw()  # hide to tray; Quit from the tray menu
         else:
             self.quit()
 
     def quit(self) -> None:
+        self._save()
         if self._tray is not None:
             try:
                 self._tray.stop()

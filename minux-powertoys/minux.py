@@ -11,6 +11,9 @@ import sys
 
 
 def main() -> None:
+    from minux.ui import enable_dpi_awareness
+    enable_dpi_awareness()  # must run before any window is created
+
     from minux.launcher import MinuxApp
     from minux.registry import all_toys
 
