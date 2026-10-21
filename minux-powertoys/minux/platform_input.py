@@ -157,17 +157,18 @@ def make_default_sink():
     return SimulationSink()
 
 
-def corner_failsafe_tripped(margin: int = 3) -> bool:
-    """True when the mouse is jammed into a screen corner.
+def mouse_moved(origin: Optional[Tuple[int, int]], tolerance: int = 8) -> bool:
+    """True when the mouse has moved more than ``tolerance`` px from ``origin``.
 
-    A panic gesture: slam the pointer into any corner to abort typing, mirroring
-    the failsafe convention of desktop automation tools. Always False
-    off-Windows (no global cursor to read).
+    ``origin`` is the cursor position captured the instant typing began (after
+    the countdown, once you've clicked into the target window). Any real nudge
+    of the physical mouse past the tolerance means "stop" -- a natural panic
+    gesture that doesn't require aiming at a corner. The small tolerance ignores
+    sub-pixel driver jitter. Always False off-Windows (no global cursor to read)
+    or before an origin has been captured.
     """
-    if not IS_WINDOWS:
+    if not IS_WINDOWS or origin is None:
         return False
     x, y = get_cursor_pos()
-    w, h = get_screen_size()
-    near_x = x <= margin or x >= (w - 1 - margin)
-    near_y = y <= margin or y >= (h - 1 - margin)
-    return near_x and near_y
+    ox, oy = origin
+    return abs(x - ox) > tolerance or abs(y - oy) > tolerance

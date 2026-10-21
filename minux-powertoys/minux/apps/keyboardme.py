@@ -11,7 +11,8 @@ Flow:
   3. When the countdown ends, the text is typed into whatever window has focus,
      at a human cadence, never faster than a person could.
 
-Panic stop: press Esc, click *Stop*, or slam the mouse into any screen corner.
+Panic stop: press Esc, click *Stop*, or (on by default) just move the mouse --
+typing halts the moment the pointer moves from where it was when typing began.
 """
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ except Exception:  # pragma: no cover - headless
     tk = None  # type: ignore
 
 from ..typing_engine import TypingProfile, build_plan, run_plan
-from ..platform_input import IS_WINDOWS, make_default_sink, corner_failsafe_tripped
+from ..platform_input import IS_WINDOWS, make_default_sink, mouse_moved, get_cursor_pos
 
 PRESETS = [("Slow & careful", 35), ("Natural", 70), ("Fast", 110), ("Human max", 160)]
 MAX_HUMAN_WPM = 160
@@ -96,9 +97,9 @@ class KeyboardMePanel(_Base):
         self.add_typos = tk.BooleanVar(value=False)
         ttk.Checkbutton(opts, text="Add occasional typos + corrections (more realistic)",
                         variable=self.add_typos).pack(anchor="w", pady=(4, 0))
-        self.corner_panic = tk.BooleanVar(value=True)
-        ttk.Checkbutton(opts, text="Panic stop: shove the mouse into a screen corner",
-                        variable=self.corner_panic).pack(anchor="w")
+        self.stop_on_move = tk.BooleanVar(value=True)
+        ttk.Checkbutton(opts, text="Stop typing the moment I move the mouse",
+                        variable=self.stop_on_move).pack(anchor="w")
 
         actions = ttk.Frame(self)
         actions.pack(fill="x", pady=(2, 6))
@@ -170,7 +171,7 @@ class KeyboardMePanel(_Base):
             "duration_min": float(self.duration_min.get()),
             "countdown": int(self.countdown.get()),
             "add_typos": bool(self.add_typos.get()),
-            "corner_panic": bool(self.corner_panic.get()),
+            "stop_on_move": bool(self.stop_on_move.get()),
         }
 
     def apply_settings(self, d: dict) -> None:
@@ -187,8 +188,8 @@ class KeyboardMePanel(_Base):
                 self.countdown.set(int(d["countdown"]))
             if "add_typos" in d:
                 self.add_typos.set(bool(d["add_typos"]))
-            if "corner_panic" in d:
-                self.corner_panic.set(bool(d["corner_panic"]))
+            if "stop_on_move" in d:
+                self.stop_on_move.set(bool(d["stop_on_move"]))
         except Exception:
             pass
         self._sync_mode()
@@ -213,11 +214,11 @@ class KeyboardMePanel(_Base):
         self.stop_btn.configure(state="normal")
         self.progress.configure(maximum=max(plan.printable_chars, 1), value=0)
         cd = max(0, int(self.countdown.get()))
-        corner = self.corner_panic.get()
-        self._worker = threading.Thread(target=self._run, args=(plan, cd, corner), daemon=True)
+        stop_on_move = self.stop_on_move.get()
+        self._worker = threading.Thread(target=self._run, args=(plan, cd, stop_on_move), daemon=True)
         self._worker.start()
 
-    def _run(self, plan, countdown, corner) -> None:
+    def _run(self, plan, countdown, stop_on_move) -> None:
         for remaining in range(countdown, 0, -1):
             if self._abort.is_set():
                 self._events.put(("done", "Cancelled."))
@@ -225,14 +226,20 @@ class KeyboardMePanel(_Base):
             self._events.put(("banner", f"Typing in {remaining}...", "#7c3aee"))
             self._events.put(("status", "Click your target window now."))
             time.sleep(1.0)
+
+        # Baseline the cursor now -- *after* you've clicked the target window --
+        # so later any physical mouse movement means "stop".
+        origin = get_cursor_pos() if stop_on_move else None
         self._events.put(("banner", "Typing...", "#0a7"))
+        if stop_on_move:
+            self._events.put(("status", "Typing... move the mouse to stop."))
 
         sink = make_default_sink()
 
         def should_abort() -> bool:
             if self._abort.is_set():
                 return True
-            if corner and corner_failsafe_tripped():
+            if stop_on_move and mouse_moved(origin):
                 self._abort.set()
                 return True
             return False
