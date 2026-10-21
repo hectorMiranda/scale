@@ -53,7 +53,6 @@ class MinuxApp:
             raise RuntimeError("tkinter is not available in this Python build.")
         self.root = tk.Tk()
         self.root.title(f"Minux PowerToys {__version__}")
-        self.root.geometry("640x660")
         self.root.minsize(520, 560)
         self._tray = None
         self._tray_error = ""
@@ -64,6 +63,9 @@ class MinuxApp:
         self._scaler.apply(float(self._settings.get("font_scale", 1.0)))
         self._build_window()
         self._restore_panel_settings()
+        # Restore the last window size/position, or fall back to a sensible default.
+        geom = self._settings.get("window_geom")
+        self.root.geometry(geom if isinstance(geom, str) and "x" in geom else "640x660")
         self.root.protocol("WM_DELETE_WINDOW", self._on_window_close)
         self.root.after(80, self._drain_actions)
 
@@ -93,14 +95,6 @@ class MinuxApp:
                 ttk.Label(tab, text=f"{toy.name} failed to load:\n{exc}",
                           foreground="#c00", padding=20).pack()
 
-        # Tray status + retry (tray icons are easy to miss, so be explicit).
-        bar = ttk.Frame(self.root, padding=(12, 2, 12, 10))
-        bar.pack(fill="x", side="bottom")
-        self.tray_note = ttk.Label(bar, text="", wraplength=440, justify="left")
-        self.tray_note.pack(side="left", fill="x", expand=True)
-        self.retry_btn = ttk.Button(bar, text="Retry tray", command=self._retry_tray)
-        self.retry_btn.pack(side="right")
-
     # ----- actions from the tray ------------------------------------------- #
     def select_tab(self, key: str) -> None:
         if key in self._tabs:
@@ -120,8 +114,6 @@ class MinuxApp:
                     self.select_tab(action[1])
                 elif action[0] == "show":
                     self._show_window()
-                elif action[0] == "tray_failed":
-                    self._update_tray_note()
                 elif action[0] == "quit":
                     self.quit()
                     return
@@ -167,25 +159,6 @@ class MinuxApp:
         except Exception as exc:
             self._tray = None
             self._tray_error = f"Tray icon failed to start: {exc}"
-            _ACTIONS.put(("tray_failed",))
-
-    def _retry_tray(self) -> None:
-        if self._tray is not None:
-            return
-        self.start_tray()
-        self._update_tray_note()
-
-    def _update_tray_note(self) -> None:
-        if self._tray is not None:
-            self.tray_note.configure(
-                text="Tray icon active - if you don't see it, click the ^ arrow by the "
-                     "clock to show hidden icons and drag it onto the taskbar. "
-                     "Closing this window hides it to the tray.",
-                foreground="#060")
-            self.retry_btn.configure(state="disabled")
-        else:
-            self.tray_note.configure(text=self._tray_error, foreground="#a60")
-            self.retry_btn.configure(state="normal")
 
     # ----- settings / zoom ------------------------------------------------- #
     def _zoom(self, delta: float) -> None:
@@ -205,6 +178,13 @@ class MinuxApp:
     def _collect_settings(self) -> dict:
         data = dict(self._settings)
         data["font_scale"] = round(self._scaler.scale, 3)
+        # Remember the window size/position once it's actually been mapped
+        # (before that, geometry reports a meaningless 1x1).
+        try:
+            if self.root.winfo_width() > 1 and self.root.winfo_height() > 1:
+                data["window_geom"] = self.root.geometry()
+        except Exception:
+            pass
         for key, panel in self._panels.items():
             if hasattr(panel, "get_settings"):
                 try:
@@ -240,7 +220,6 @@ class MinuxApp:
 
     def run(self) -> None:
         live = self.start_tray()
-        self._update_tray_note()
         print("Minux PowerToys:",
               "tray icon active (check the ^ overflow by the clock)." if live
               else self._tray_error, file=sys.stderr)
