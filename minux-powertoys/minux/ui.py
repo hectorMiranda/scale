@@ -55,6 +55,10 @@ class FontScaler:
         self.root = root
         self.scale = 1.0
         self._base: dict = {}  # font name -> base size (signed int as Tk reports)
+        # Keep strong refs to the Font objects we create: a tkfont.Font with
+        # delete_font=True deletes its named font from Tcl when garbage
+        # collected, so dropping the ref silently destroys the named font.
+        self._fonts: dict = {}
         self._capture_standard()
         self._make_custom()
         self._wire_ttk_styles()
@@ -84,11 +88,16 @@ class FontScaler:
             size = ds + delta
             weight = "bold" if bold else "normal"
             try:
-                tkfont.Font(name=name, exists=False, family=family, size=size, weight=weight)
+                # Retain the ref (see _fonts note) so the named font survives.
+                self._fonts[name] = tkfont.Font(
+                    root=self.root, name=name, exists=False,
+                    family=family, size=size, weight=weight)
             except Exception:
                 # Already exists: just reconfigure it.
                 try:
-                    tkfont.nametofont(name).configure(family=family, size=size, weight=weight)
+                    f = tkfont.nametofont(name)
+                    f.configure(family=family, size=size, weight=weight)
+                    self._fonts[name] = f
                 except Exception:
                     continue
             self._base[name] = size

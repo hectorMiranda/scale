@@ -47,6 +47,8 @@ class KeyboardMePanel(_Base):
         self._abort = threading.Event()
         self._worker: Optional[threading.Thread] = None
         self._events: "queue.Queue[tuple]" = queue.Queue()
+        self._flashing = False
+        self._flash_on = False
         self._build_ui()
         self.winfo_toplevel().bind("<Escape>", lambda _e: self._stop())
         self.after(60, self._pump)
@@ -109,8 +111,13 @@ class KeyboardMePanel(_Base):
         self.stop_btn.pack(side="left", padx=6)
 
         # Big, unmissable countdown / typing banner (window stays visible).
-        self.banner = tk.Label(self, text="", font="MinuxBanner", fg="#7c3aee")
-        self.banner.pack(fill="x", pady=(2, 2))
+        # A thick green frame that flashes so it's easy to spot from another
+        # monitor; the text rides on MinuxBanner, which grows with the A+/A- size.
+        self.banner_wrap = tk.Frame(self, highlightthickness=0)
+        self.banner_wrap.pack(fill="x", pady=(4, 4))
+        self.banner = tk.Label(self.banner_wrap, text="", font="MinuxBanner",
+                               fg="#064e3b", pady=10)
+        self.banner.pack(fill="x")
         self.progress = ttk.Progressbar(self, mode="determinate")
         self.progress.pack(fill="x", pady=(2, 2))
         self.status = ttk.Label(self, text=self._platform_hint())
@@ -264,6 +271,33 @@ class KeyboardMePanel(_Base):
     def _stop(self) -> None:
         self._abort.set()
 
+    # ----- flashing countdown banner --------------------------------------- #
+    def _start_flash(self) -> None:
+        self.banner_wrap.configure(highlightthickness=5)
+        if not self._flashing:
+            self._flashing = True
+            self._flash_tick()
+
+    def _flash_tick(self) -> None:
+        if not self._flashing:
+            return
+        self._flash_on = not self._flash_on
+        if self._flash_on:
+            self.banner_wrap.configure(highlightbackground="#10b981", highlightcolor="#10b981")
+            self.banner.configure(bg="#d1fae5")
+        else:
+            self.banner_wrap.configure(highlightbackground="#047857", highlightcolor="#047857")
+            self.banner.configure(bg="#6ee7b7")
+        self.after(450, self._flash_tick)
+
+    def _stop_flash(self) -> None:
+        self._flashing = False
+        self.banner_wrap.configure(highlightthickness=0)
+        try:
+            self.banner.configure(bg=self.banner_wrap.cget("background"))
+        except Exception:
+            pass
+
     # ----- event pump ------------------------------------------------------ #
     def _pump(self) -> None:
         try:
@@ -271,7 +305,11 @@ class KeyboardMePanel(_Base):
                 evt = self._events.get_nowait()
                 kind = evt[0]
                 if kind == "banner":
-                    self.banner.configure(text=evt[1], fg=evt[2])
+                    self.banner.configure(text=evt[1])
+                    if evt[1]:
+                        self._start_flash()
+                    else:
+                        self._stop_flash()
                 elif kind == "status":
                     self.status.configure(text=evt[1])
                 elif kind == "progress":
@@ -281,6 +319,7 @@ class KeyboardMePanel(_Base):
                     self.type_btn.configure(state="normal")
                     self.stop_btn.configure(state="disabled")
                     self.banner.configure(text="")
+                    self._stop_flash()
                     self.status.configure(text=evt[1])
         except queue.Empty:
             pass
