@@ -57,6 +57,13 @@ class KeyboardMePanel(_Base):
     # ----- UI -------------------------------------------------------------- #
     def _build_ui(self) -> None:
         ttk.Label(self, text="Text to type", font="MinuxHeading").pack(anchor="w")
+
+        # Editor toolbar: quick actions right under the heading.
+        toolbar = ttk.Frame(self)
+        toolbar.pack(fill="x", pady=(2, 0))
+        ttk.Button(toolbar, text="Reset", command=self._reset_text).pack(side="left")
+        ttk.Button(toolbar, text="Clear & paste", command=self._clear_and_paste).pack(side="left", padx=(6, 0))
+
         self.editor = LineNumberedText(self, on_change=self._refresh_estimate,
                                        on_caret=self._on_caret, height=8)
         self.editor.pack(fill="both", expand=True, pady=(2, 2))
@@ -160,6 +167,24 @@ class KeyboardMePanel(_Base):
 
     def _get_text(self) -> str:
         return self.text.get("1.0", "end-1c")
+
+    def _set_text(self, value: str) -> None:
+        self.text.delete("1.0", "end")
+        if value:
+            self.text.insert("1.0", value)
+        self.text.focus_set()
+        self.editor.refresh()        # programmatic change: redraw gutter/caret
+        self._refresh_estimate()
+
+    def _reset_text(self) -> None:
+        self._set_text("")
+
+    def _clear_and_paste(self) -> None:
+        try:
+            clip = self.clipboard_get()
+        except Exception:
+            clip = ""          # empty or non-text clipboard
+        self._set_text(clip)
 
     def _plan(self):
         prof = self._profile()
