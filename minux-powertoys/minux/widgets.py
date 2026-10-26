@@ -26,6 +26,8 @@ except Exception:  # pragma: no cover - headless
 GUTTER_BG = "#f3f3f3"      # VS Code light gutter
 GUTTER_FG = "#9aa0a6"      # muted line numbers
 CURLINE_BG = "#eef3fb"     # faint current-line band
+SEL_BG = "#add6ff"         # VS Code selection: light blue, dark text stays readable
+SEL_BG_INACTIVE = "#d6e4f7"  # selection when the editor loses focus
 EDITOR_FONT = "TkFixedFont"
 
 
@@ -54,9 +56,15 @@ class LineNumberedText(_Base):
         self.text = tk.Text(self, height=height, wrap="word", font=EDITOR_FONT,
                             undo=True, bd=0, highlightthickness=1,
                             highlightbackground="#c8c8c8", highlightcolor="#4c9aff",
+                            foreground="#1e1e1e", background="#ffffff", insertbackground="#1e1e1e",
+                            # VS Code-style selection: light blue band, dark text stays readable.
+                            selectbackground=SEL_BG, selectforeground="#1e1e1e",
+                            inactiveselectbackground=SEL_BG_INACTIVE,
                             yscrollcommand=self._on_textscroll)
         self.text.pack(side="right", fill="both", expand=True)
         self.text.tag_configure("curline", background=CURLINE_BG)
+        # Keep the selection drawn above the current-line highlight.
+        self.text.tag_raise("sel")
 
         for seq in ("<KeyRelease>", "<ButtonRelease-1>", "<<Paste>>", "<<Cut>>",
                     "<Configure>", "<MouseWheel>"):
