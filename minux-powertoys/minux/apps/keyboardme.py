@@ -30,9 +30,15 @@ except Exception:  # pragma: no cover - headless
 
 from ..typing_engine import TypingProfile, build_plan, run_plan
 from ..platform_input import IS_WINDOWS, make_default_sink, mouse_moved, get_cursor_pos
-from ..widgets import LineNumberedText
+from ..widgets import LineNumberedText, IconButton, RibbonGroup, RIBBON_BG
 
-PRESETS = [("Slow & careful", 35), ("Natural", 70), ("Fast", 110), ("Human max", 160)]
+# (icon, label, wpm) -- the speed presets, each with its own critter/speed icon.
+PRESETS = [
+    ("turtle", "Slow & careful", 35),
+    ("walk", "Natural", 70),
+    ("rabbit", "Fast", 110),
+    ("bolt", "Human max", 160),
+]
 MAX_HUMAN_WPM = 160
 
 
@@ -55,107 +61,182 @@ class KeyboardMePanel(_Base):
         self.after(60, self._pump)
 
     # ----- UI -------------------------------------------------------------- #
+    def _sep(self, parent) -> None:
+        ttk.Separator(parent, orient="vertical").pack(side="left", fill="y", padx=4, pady=3)
+
     def _build_ui(self) -> None:
-        ttk.Label(self, text="Text to type", font="MinuxHeading").pack(anchor="w")
+        # Shared state variables (names kept so settings/behaviour are unchanged).
+        self.mode = tk.StringVar(value="wpm")
+        self.duration_min = tk.DoubleVar(value=60.0)
+        self.countdown = tk.IntVar(value=5)
+        self.add_typos = tk.BooleanVar(value=False)
+        self.stop_on_move = tk.BooleanVar(value=True)
+        self._icon_buttons = []   # for relayout on text-size change
 
-        # Editor toolbar: quick actions right under the heading.
-        toolbar = ttk.Frame(self)
-        toolbar.pack(fill="x", pady=(2, 0))
-        ttk.Button(toolbar, text="Reset", command=self._reset_text).pack(side="left")
-        ttk.Button(toolbar, text="Clear & paste", command=self._clear_and_paste).pack(side="left", padx=(6, 0))
+        # ---- Office-style ribbon ------------------------------------------ #
+        ribbon = tk.Frame(self, background=RIBBON_BG, bd=1, relief="solid",
+                          highlightthickness=0)
+        ribbon.configure(relief="flat")
+        ribbon.pack(fill="x", pady=(0, 6))
 
+        # Clipboard group.
+        g = RibbonGroup(ribbon, "Clipboard")
+        g.pack(side="left", fill="y", padx=(2, 0), pady=1)
+        self._ib(g.body, "reset", "Reset", self._reset_text).pack(side="left")
+        self._ib(g.body, "paste", "Clear & paste", self._clear_and_paste).pack(side="left")
+        self._sep(ribbon)
+
+        # Speed group.
+        g = RibbonGroup(ribbon, "Speed")
+        g.pack(side="left", fill="y", pady=1)
+        self._mode_btns = {
+            "wpm": self._ib(g.body, "gauge", "By speed", lambda: self._set_mode("wpm")),
+            "duration": self._ib(g.body, "clock", "By time", lambda: self._set_mode("duration")),
+        }
+        self._mode_btns["wpm"].pack(side="left")
+        self._mode_btns["duration"].pack(side="left")
+        self._preset_btns = {}
+        for icon, label, val in PRESETS:
+            b = self._ib(g.body, icon, label, lambda v=val: self._apply_preset(v))
+            b.pack(side="left")
+            self._preset_btns[val] = b
+        # Fine speed + duration controls, stacked under the preset row.
+        fine = tk.Frame(g.body, background=RIBBON_BG)
+        fine.pack(side="left", padx=(6, 2))
+        self.wpm_scale = ttk.Scale(fine, from_=15, to=MAX_HUMAN_WPM, length=120,
+                                   orient="horizontal")
+        self.wpm_scale.set(70)
+        # Wire the callback only after the initial value is set, so it doesn't
+        # fire before the rest of the ribbon exists.
+        self.wpm_scale.configure(command=lambda _v: self._on_wpm_change())
+        self.wpm_scale.grid(row=0, column=0, sticky="w")
+        self.wpm_label = ttk.Label(fine, text="70 WPM", background=RIBBON_BG,
+                                   width=8, foreground="#444b53")
+        self.wpm_label.grid(row=0, column=1, sticky="w", padx=(6, 0))
+        dline = tk.Frame(fine, background=RIBBON_BG)
+        dline.grid(row=1, column=0, columnspan=2, sticky="w", pady=(4, 0))
+        tk.Label(dline, text="minutes:", background=RIBBON_BG,
+                 foreground="#8a8a8a").pack(side="left")
+        ttk.Spinbox(dline, from_=0.1, to=600, increment=1, width=7,
+                    textvariable=self.duration_min,
+                    command=self._refresh_estimate).pack(side="left", padx=(4, 0))
+        self._sep(ribbon)
+
+        # Options group.
+        g = RibbonGroup(ribbon, "Options")
+        g.pack(side="left", fill="y", pady=1)
+        cd = tk.Frame(g.body, background=RIBBON_BG)
+        cd.pack(side="left", padx=(4, 2))
+        tk.Label(cd, text="Countdown", background=RIBBON_BG,
+                 foreground="#8a8a8a").pack(side="top")
+        cdrow = tk.Frame(cd, background=RIBBON_BG)
+        cdrow.pack(side="top")
+        ttk.Spinbox(cdrow, from_=0, to=60, width=4, textvariable=self.countdown,
+                    command=self._refresh_estimate).pack(side="left")
+        tk.Label(cdrow, text="s", background=RIBBON_BG,
+                 foreground="#8a8a8a").pack(side="left", padx=(2, 0))
+        self._typo_btn = self._ib(g.body, "pencil", "Typos", self._toggle_typos)
+        self._typo_btn.pack(side="left")
+        self._move_btn = self._ib(g.body, "mouse", "Stop on move", self._toggle_move)
+        self._move_btn.pack(side="left")
+        self._sep(ribbon)
+
+        # Run group.
+        g = RibbonGroup(ribbon, "Run")
+        g.pack(side="left", fill="y", pady=1)
+        self.type_btn = self._ib(g.body, "play", "Type", self._start, accent="#1a8a4a")
+        self.type_btn.pack(side="left")
+        self.stop_btn = self._ib(g.body, "stop", "Stop", self._stop, accent="#c0392b")
+        self.stop_btn.pack(side="left")
+        self.stop_btn.set_enabled(False)
+
+        # Status / typing alert, living in the toolbar (flashes during countdown).
+        alert = tk.Frame(ribbon, background=RIBBON_BG)
+        alert.pack(side="right", fill="both", expand=True, padx=(6, 2), pady=3)
+        self.banner_wrap = tk.Frame(alert, highlightthickness=0, background=RIBBON_BG)
+        self.banner_wrap.pack(fill="both", expand=True)
+        self.banner = tk.Label(self.banner_wrap, text="", font="MinuxTitle",
+                               fg="#064e3b", background=RIBBON_BG)
+        self.banner.pack(fill="both", expand=True)
+
+        # ---- Editor ------------------------------------------------------- #
         self.editor = LineNumberedText(self, on_change=self._refresh_estimate,
                                        on_caret=self._on_caret, height=8)
-        self.editor.pack(fill="both", expand=True, pady=(2, 2))
+        self.editor.pack(fill="both", expand=True, pady=(0, 2))
         self.text = self.editor.text  # existing code types/reads through self.text
         self.text.focus_set()
 
         # Editor status strip: Ln/Col on the left, live typing estimate on the right.
         estrip = ttk.Frame(self)
-        estrip.pack(fill="x", pady=(0, 8))
+        estrip.pack(fill="x", pady=(0, 4))
         self.caret_lbl = ttk.Label(estrip, text="Ln 1, Col 1", foreground="#888")
         self.caret_lbl.pack(side="left")
         self.estimate_lbl = ttk.Label(estrip, text="", foreground="#0a6", anchor="e")
         self.estimate_lbl.pack(side="right")
 
-        speed = ttk.LabelFrame(self, text="Speed", padding=10)
-        speed.pack(fill="x", pady=(0, 8))
-        self.mode = tk.StringVar(value="wpm")
-        ttk.Radiobutton(speed, text="By speed (WPM)", variable=self.mode, value="wpm",
-                        command=self._sync_mode).grid(row=0, column=0, sticky="w")
-        ttk.Radiobutton(speed, text="By total time", variable=self.mode, value="duration",
-                        command=self._sync_mode).grid(row=0, column=1, sticky="w")
-        self.wpm_scale = ttk.Scale(speed, from_=15, to=MAX_HUMAN_WPM, orient="horizontal",
-                                   command=lambda _v: self._refresh_estimate())
-        self.wpm_scale.set(70)
-        self.wpm_scale.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(6, 2))
-        speed.columnconfigure(0, weight=1)
-        speed.columnconfigure(1, weight=1)
-        self.wpm_label = ttk.Label(speed, text="70 WPM")
-        self.wpm_label.grid(row=2, column=0, columnspan=2, sticky="w")
-        prow = ttk.Frame(speed)
-        prow.grid(row=3, column=0, columnspan=2, sticky="w", pady=(6, 0))
-        for label, val in PRESETS:
-            ttk.Button(prow, text=label, width=13,
-                       command=lambda v=val: self._apply_preset(v)).pack(side="left", padx=2)
-        drow = ttk.Frame(speed)
-        drow.grid(row=4, column=0, columnspan=2, sticky="w", pady=(8, 0))
-        ttk.Label(drow, text="Total time (minutes):").pack(side="left")
-        self.duration_min = tk.DoubleVar(value=60.0)
-        ttk.Spinbox(drow, from_=0.1, to=600, increment=1, width=8, textvariable=self.duration_min,
-                    command=self._refresh_estimate).pack(side="left", padx=6)
-
-        opts = ttk.LabelFrame(self, text="Options", padding=10)
-        opts.pack(fill="x", pady=(0, 8))
-        crow = ttk.Frame(opts)
-        crow.pack(fill="x")
-        ttk.Label(crow, text="Countdown (seconds):").pack(side="left")
-        self.countdown = tk.IntVar(value=5)
-        ttk.Spinbox(crow, from_=0, to=60, width=6, textvariable=self.countdown).pack(side="left", padx=6)
-        ttk.Label(crow, text="  <- time to click your target window",
-                  foreground="#888").pack(side="left")
-        self.add_typos = tk.BooleanVar(value=False)
-        ttk.Checkbutton(opts, text="Add occasional typos + corrections (more realistic)",
-                        variable=self.add_typos).pack(anchor="w", pady=(4, 0))
-        self.stop_on_move = tk.BooleanVar(value=True)
-        ttk.Checkbutton(opts, text="Stop typing the moment I move the mouse",
-                        variable=self.stop_on_move).pack(anchor="w")
-
-        actions = ttk.Frame(self)
-        actions.pack(fill="x", pady=(2, 6))
-        self.type_btn = ttk.Button(actions, text="Type", command=self._start)
-        self.type_btn.pack(side="left")
-        self.stop_btn = ttk.Button(actions, text="Stop", command=self._stop, state="disabled")
-        self.stop_btn.pack(side="left", padx=6)
-
-        # Big, unmissable countdown / typing banner (window stays visible).
-        # A thick green frame that flashes so it's easy to spot from another
-        # monitor; the text rides on MinuxBanner, which grows with the A+/A- size.
-        self.banner_wrap = tk.Frame(self, highlightthickness=0)
-        self.banner_wrap.pack(fill="x", pady=(4, 4))
-        self.banner = tk.Label(self.banner_wrap, text="", font="MinuxBanner",
-                               fg="#064e3b", pady=10)
-        self.banner.pack(fill="x")
+        # ---- Bottom status bar (progress + messages) ---------------------- #
         self.progress = ttk.Progressbar(self, mode="determinate")
-        self.progress.pack(fill="x", pady=(2, 2))
-        self.status = ttk.Label(self, text=self._platform_hint())
+        self.progress.pack(fill="x", pady=(2, 1))
+        self.status = ttk.Label(self, text=self._platform_hint(), foreground="#666")
         self.status.pack(anchor="w")
 
         self._sync_mode()
         self._refresh_estimate()
+
+    def _ib(self, parent, icon, text, command, accent=None):
+        b = IconButton(parent, icon, text=text, command=command, accent=accent)
+        self._icon_buttons.append(b)
+        return b
 
     def _platform_hint(self) -> str:
         return ("Ready." if IS_WINDOWS else
                 "Simulation mode (not on Windows): keystrokes are logged, not sent.")
 
     # ----- behaviour ------------------------------------------------------- #
+    def _set_wpm(self, wpm) -> None:
+        # A disabled ttk.Scale ignores .set(), so always enable before setting;
+        # _sync_mode() restores the correct enabled/disabled state afterwards.
+        self.wpm_scale.configure(state="normal")
+        self.wpm_scale.set(float(wpm))
+
     def _apply_preset(self, wpm: int) -> None:
         self.mode.set("wpm")
-        self.wpm_scale.set(wpm)
+        self._set_wpm(wpm)
         self._sync_mode()
+
+    def _set_mode(self, mode: str) -> None:
+        self.mode.set(mode)
+        self._sync_mode()
+
+    def _on_wpm_change(self) -> None:
+        self._refresh_estimate()
+        self._update_toggles()
+
+    def _toggle_typos(self) -> None:
+        self.add_typos.set(not self.add_typos.get())
+        self._update_toggles()
+        self._refresh_estimate()
+
+    def _toggle_move(self) -> None:
+        self.stop_on_move.set(not self.stop_on_move.get())
+        self._update_toggles()
+
+    def _update_toggles(self) -> None:
+        """Reflect the current state in the ribbon's toggle buttons."""
+        if not hasattr(self, "_move_btn"):   # still being built
+            return
+        is_wpm = self.mode.get() == "wpm"
+        self._mode_btns["wpm"].set_active(is_wpm)
+        self._mode_btns["duration"].set_active(not is_wpm)
+        cur = self._current_wpm()
+        for val, b in self._preset_btns.items():
+            b.set_active(is_wpm and cur == val)
+        self._typo_btn.set_active(self.add_typos.get())
+        self._move_btn.set_active(self.stop_on_move.get())
 
     def _sync_mode(self) -> None:
         self.wpm_scale.configure(state="normal" if self.mode.get() == "wpm" else "disabled")
+        self._update_toggles()
         self._refresh_estimate()
 
     def _current_wpm(self) -> int:
@@ -200,6 +281,11 @@ class KeyboardMePanel(_Base):
     def on_font_scaled(self) -> None:
         """Called by the launcher after the app text size changes."""
         self.after_idle(self.editor.refresh)
+        for b in self._icon_buttons:
+            try:
+                b.relayout()
+            except Exception:
+                pass
 
     def _refresh_estimate(self) -> None:
         if not hasattr(self, "wpm_label"):
@@ -232,7 +318,7 @@ class KeyboardMePanel(_Base):
             if "mode" in d:
                 self.mode.set(d["mode"])
             if "wpm" in d:
-                self.wpm_scale.set(float(d["wpm"]))
+                self._set_wpm(d["wpm"])
             if "duration_min" in d:
                 self.duration_min.set(float(d["duration_min"]))
             if "countdown" in d:
@@ -261,8 +347,8 @@ class KeyboardMePanel(_Base):
             plan = build_plan(self._get_text(), prof)
 
         self._abort.clear()
-        self.type_btn.configure(state="disabled")
-        self.stop_btn.configure(state="normal")
+        self.type_btn.set_enabled(False)
+        self.stop_btn.set_enabled(True)
         self.progress.configure(maximum=max(plan.printable_chars, 1), value=0)
         cd = max(0, int(self.countdown.get()))
         stop_on_move = self.stop_on_move.get()
@@ -360,8 +446,8 @@ class KeyboardMePanel(_Base):
                     self.progress.configure(value=evt[1])
                     self.status.configure(text=f"Typing... {evt[1]}/{evt[2]}")
                 elif kind == "done":
-                    self.type_btn.configure(state="normal")
-                    self.stop_btn.configure(state="disabled")
+                    self.type_btn.set_enabled(True)
+                    self.stop_btn.set_enabled(False)
                     self.banner.configure(text="")
                     self._stop_flash()
                     self.status.configure(text=evt[1])

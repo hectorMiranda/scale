@@ -22,6 +22,8 @@ try:
 except Exception:  # pragma: no cover - headless
     tk = None  # type: ignore
 
+from . import icons
+
 
 GUTTER_BG = "#f3f3f3"      # VS Code light gutter
 GUTTER_FG = "#9aa0a6"      # muted line numbers
@@ -141,3 +143,143 @@ class LineNumberedText(_Base):
     def refresh(self) -> None:
         """Force a redraw (e.g. after the app font size changes)."""
         self._refresh()
+
+
+# Office-style palette for the ribbon.
+_HOVER_BG = "#eaf2fb"
+_HOVER_BORDER = "#c3ddf5"
+_ACTIVE_BG = "#cfe4f8"
+_ACTIVE_BORDER = "#8bb9e4"
+_RIBBON_BG = "#f7f7f7"
+RIBBON_BG = _RIBBON_BG   # public alias for hosts
+_CAPTION_FG = "#8a8a8a"
+_ICON_FG = "#444b53"
+_ICON_DISABLED = "#b6bbc0"
+
+
+class IconButton(tk.Frame if tk is not None else object):
+    """A flat, Office-ribbon-style button: a vector icon over (or beside) a label.
+
+    Behaves like a button (hover highlight, click command). Can act as a toggle
+    that shows a persistent "pressed" look via :meth:`set_active`, and can be
+    enabled/disabled with :meth:`set_enabled`. The icon rides on the app text
+    size when the host calls :meth:`relayout` after a scale change.
+    """
+
+    def __init__(self, master, icon: str, text: str = "", command=None,
+                 accent: Optional[str] = None, orient: str = "vertical",
+                 bg: str = _RIBBON_BG) -> None:
+        super().__init__(master, bd=0, highlightthickness=1,
+                         highlightbackground=bg, highlightcolor=bg, background=bg)
+        self._icon = icon
+        self._command = command
+        self._accent = accent
+        self._orient = orient
+        self._base_bg = bg
+        self._enabled = True
+        self._active = False
+        self._pressed = False
+
+        self._size = self._icon_size()
+        self.canvas = tk.Canvas(self, width=self._size, height=self._size,
+                                highlightthickness=0, bd=0, background=bg)
+        self.label = tk.Label(self, text=text, background=bg, foreground=_ICON_FG) if text else None
+
+        if orient == "vertical":
+            self.canvas.pack(side="top", padx=8, pady=(5, 1))
+            if self.label:
+                self.label.pack(side="top", padx=6, pady=(0, 4))
+        else:
+            self.canvas.pack(side="left", padx=(7, 3), pady=4)
+            if self.label:
+                self.label.pack(side="left", padx=(0, 9), pady=4)
+
+        self._parts = [self, self.canvas] + ([self.label] if self.label else [])
+        for w in self._parts:
+            w.bind("<Enter>", self._on_enter)
+            w.bind("<Leave>", self._on_leave)
+            w.bind("<Button-1>", self._on_press)
+            w.bind("<ButtonRelease-1>", self._on_release)
+        self._redraw()
+        self._apply_bg(bg, bg)
+
+    # ----- sizing / drawing ----------------------------------------------- #
+    def _icon_size(self) -> int:
+        try:
+            base = abs(int(tkfont.nametofont("TkDefaultFont").cget("size")))
+        except Exception:
+            base = 12
+        return max(16, int(round(base * 1.7)))
+
+    def _redraw(self) -> None:
+        color = _ICON_FG if self._enabled else _ICON_DISABLED
+        accent = (self._accent or color) if self._enabled else _ICON_DISABLED
+        icons.draw(self.canvas, self._icon, self._size, color, accent)
+
+    def relayout(self) -> None:
+        """Re-size the icon to the current text size (host calls after zoom)."""
+        self._size = self._icon_size()
+        self.canvas.configure(width=self._size, height=self._size)
+        self._redraw()
+
+    # ----- state ----------------------------------------------------------- #
+    def _apply_bg(self, bg: str, border: str) -> None:
+        self.configure(background=bg, highlightbackground=border, highlightcolor=border)
+        for w in self._parts:
+            if w is self:
+                continue
+            try:
+                w.configure(background=bg)
+            except Exception:
+                pass
+
+    def _restore(self) -> None:
+        if self._active and self._enabled:
+            self._apply_bg(_ACTIVE_BG, _ACTIVE_BORDER)
+        else:
+            self._apply_bg(self._base_bg, self._base_bg)
+
+    def set_active(self, on: bool) -> None:
+        self._active = bool(on)
+        self._restore()
+
+    def set_enabled(self, on: bool) -> None:
+        self._enabled = bool(on)
+        self._redraw()
+        self._restore()
+        if self.label:
+            self.label.configure(foreground=_ICON_FG if self._enabled else _ICON_DISABLED)
+
+    # ----- events ---------------------------------------------------------- #
+    def _on_enter(self, _e=None) -> None:
+        if self._enabled and not self._active:
+            self._apply_bg(_HOVER_BG, _HOVER_BORDER)
+
+    def _on_leave(self, _e=None) -> None:
+        self._pressed = False
+        self._restore()
+
+    def _on_press(self, _e=None) -> None:
+        if self._enabled:
+            self._pressed = True
+            self._apply_bg(_ACTIVE_BG, _ACTIVE_BORDER)
+
+    def _on_release(self, _e=None) -> None:
+        if self._enabled and self._pressed and self._command:
+            self._pressed = False
+            self._on_enter()
+            self._command()
+        else:
+            self._pressed = False
+            self._restore()
+
+
+class RibbonGroup(tk.Frame if tk is not None else object):
+    """A labelled cluster of ribbon controls with a caption underneath."""
+
+    def __init__(self, master, title: str, bg: str = _RIBBON_BG) -> None:
+        super().__init__(master, background=bg)
+        self.body = tk.Frame(self, background=bg)
+        self.body.pack(side="top", fill="both", expand=True)
+        tk.Label(self, text=title, foreground=_CAPTION_FG, background=bg,
+                 font="TkSmallCaptionFont").pack(side="top", pady=(1, 2))

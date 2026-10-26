@@ -70,12 +70,10 @@ class MinuxApp:
         self.root.after(80, self._drain_actions)
 
     def _build_window(self) -> None:
-        header = ttk.Frame(self.root, padding=(12, 10, 12, 0))
+        # Slim header: just the live text-size control on the right (the window
+        # title bar already shows the app name). Scales the whole UI, remembered.
+        header = ttk.Frame(self.root, padding=(12, 8, 12, 0))
         header.pack(fill="x")
-        ttk.Label(header, text="Minux PowerToys", font="MinuxTitle").pack(side="left")
-
-        # Text-size controls (scale the whole UI live; remembered across launches).
-        ttk.Label(header, text=f"v{__version__}", foreground="#888").pack(side="right", padx=(8, 0))
         ttk.Button(header, text="A+", width=3, command=lambda: self._zoom(+0.1)).pack(side="right", padx=1)
         self._scale_lbl = ttk.Label(header, width=5, anchor="center",
                                     text=f"{self._scaler.percent()}%")
