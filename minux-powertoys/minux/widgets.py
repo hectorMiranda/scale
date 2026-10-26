@@ -194,6 +194,11 @@ class IconButton(tk.Frame if tk is not None else object):
             if self.label:
                 self.label.pack(side="left", padx=(0, 9), pady=4)
 
+        self._tip_text = text
+        self._tip = None
+        self._tip_after = None
+        self._compact = False
+
         self._parts = [self, self.canvas] + ([self.label] if self.label else [])
         for w in self._parts:
             w.bind("<Enter>", self._on_enter)
@@ -202,6 +207,20 @@ class IconButton(tk.Frame if tk is not None else object):
             w.bind("<ButtonRelease-1>", self._on_release)
         self._redraw()
         self._apply_bg(bg, bg)
+
+    # ----- responsive: hide the text label (icon-only) --------------------- #
+    def set_compact(self, on: bool) -> None:
+        on = bool(on)
+        if on == self._compact or self.label is None:
+            self._compact = on
+            return
+        self._compact = on
+        if on:
+            self.label.pack_forget()
+        elif self._orient == "vertical":
+            self.label.pack(side="top", padx=6, pady=(0, 4))
+        else:
+            self.label.pack(side="left", padx=(0, 9), pady=4)
 
     # ----- sizing / drawing ----------------------------------------------- #
     def _icon_size(self) -> int:
@@ -250,16 +269,53 @@ class IconButton(tk.Frame if tk is not None else object):
         if self.label:
             self.label.configure(foreground=_ICON_FG if self._enabled else _ICON_DISABLED)
 
+    # ----- tooltip (shown when the label is hidden) ------------------------ #
+    def _schedule_tip(self) -> None:
+        if self._compact and self._tip_text and self._tip_after is None:
+            self._tip_after = self.after(450, self._show_tip)
+
+    def _show_tip(self) -> None:
+        self._tip_after = None
+        if self._tip is not None or not self._compact or not self._tip_text:
+            return
+        try:
+            x = self.winfo_rootx() + 6
+            y = self.winfo_rooty() + self.winfo_height() + 2
+            self._tip = tk.Toplevel(self)
+            self._tip.wm_overrideredirect(True)
+            self._tip.wm_geometry(f"+{x}+{y}")
+            tk.Label(self._tip, text=self._tip_text, background="#2b2b2b",
+                     foreground="white", padx=6, pady=2, bd=0).pack()
+        except Exception:
+            self._tip = None
+
+    def _hide_tip(self) -> None:
+        if self._tip_after is not None:
+            try:
+                self.after_cancel(self._tip_after)
+            except Exception:
+                pass
+            self._tip_after = None
+        if self._tip is not None:
+            try:
+                self._tip.destroy()
+            except Exception:
+                pass
+            self._tip = None
+
     # ----- events ---------------------------------------------------------- #
     def _on_enter(self, _e=None) -> None:
         if self._enabled and not self._active:
             self._apply_bg(_HOVER_BG, _HOVER_BORDER)
+        self._schedule_tip()
 
     def _on_leave(self, _e=None) -> None:
         self._pressed = False
         self._restore()
+        self._hide_tip()
 
     def _on_press(self, _e=None) -> None:
+        self._hide_tip()
         if self._enabled:
             self._pressed = True
             self._apply_bg(_ACTIVE_BG, _ACTIVE_BORDER)
@@ -279,7 +335,20 @@ class RibbonGroup(tk.Frame if tk is not None else object):
 
     def __init__(self, master, title: str, bg: str = _RIBBON_BG) -> None:
         super().__init__(master, background=bg)
+        self._bg = bg
         self.body = tk.Frame(self, background=bg)
         self.body.pack(side="top", fill="both", expand=True)
-        tk.Label(self, text=title, foreground=_CAPTION_FG, background=bg,
-                 font="TkSmallCaptionFont").pack(side="top", pady=(1, 2))
+        self.caption = tk.Label(self, text=title, foreground=_CAPTION_FG, background=bg,
+                                font="TkSmallCaptionFont")
+        self.caption.pack(side="top", pady=(1, 2))
+        self._caption_visible = True
+
+    def set_caption_visible(self, on: bool) -> None:
+        on = bool(on)
+        if on == self._caption_visible:
+            return
+        self._caption_visible = on
+        if on:
+            self.caption.pack(side="top", pady=(1, 2))
+        else:
+            self.caption.pack_forget()

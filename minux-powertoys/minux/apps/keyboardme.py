@@ -56,6 +56,8 @@ class KeyboardMePanel(_Base):
         self._events: "queue.Queue[tuple]" = queue.Queue()
         self._flashing = False
         self._flash_on = False
+        self._zoom_host = None       # set by the launcher (set_zoom_host)
+        self._percent_fn = None
         self._build_ui()
         self.winfo_toplevel().bind("<Escape>", lambda _e: self._stop())
         self.after(60, self._pump)
@@ -71,23 +73,29 @@ class KeyboardMePanel(_Base):
         self.countdown = tk.IntVar(value=5)
         self.add_typos = tk.BooleanVar(value=False)
         self.stop_on_move = tk.BooleanVar(value=True)
-        self._icon_buttons = []   # for relayout on text-size change
+        self._icon_buttons = []     # for relayout on text-size change
+        self._ribbon_groups = []    # for caption show/hide when space is tight
+        self._fine_visible = True
+        self._compact_level = 0
+        self._reflowing = False
+        self._reflow_after = None
 
         # ---- Office-style ribbon ------------------------------------------ #
         ribbon = tk.Frame(self, background=RIBBON_BG, bd=1, relief="solid",
                           highlightthickness=0)
         ribbon.configure(relief="flat")
         ribbon.pack(fill="x", pady=(0, 6))
+        self._ribbon = ribbon
 
         # Clipboard group.
-        g = RibbonGroup(ribbon, "Clipboard")
+        g = self._grp(ribbon, "Clipboard")
         g.pack(side="left", fill="y", padx=(2, 0), pady=1)
         self._ib(g.body, "reset", "Reset", self._reset_text).pack(side="left")
         self._ib(g.body, "paste", "Clear & paste", self._clear_and_paste).pack(side="left")
         self._sep(ribbon)
 
         # Speed group.
-        g = RibbonGroup(ribbon, "Speed")
+        g = self._grp(ribbon, "Speed")
         g.pack(side="left", fill="y", pady=1)
         self._mode_btns = {
             "wpm": self._ib(g.body, "gauge", "By speed", lambda: self._set_mode("wpm")),
@@ -103,6 +111,7 @@ class KeyboardMePanel(_Base):
         # Fine speed + duration controls, stacked under the preset row.
         fine = tk.Frame(g.body, background=RIBBON_BG)
         fine.pack(side="left", padx=(6, 2))
+        self._fine = fine
         self.wpm_scale = ttk.Scale(fine, from_=15, to=MAX_HUMAN_WPM, length=120,
                                    orient="horizontal")
         self.wpm_scale.set(70)
@@ -123,7 +132,7 @@ class KeyboardMePanel(_Base):
         self._sep(ribbon)
 
         # Options group.
-        g = RibbonGroup(ribbon, "Options")
+        g = self._grp(ribbon, "Options")
         g.pack(side="left", fill="y", pady=1)
         cd = tk.Frame(g.body, background=RIBBON_BG)
         cd.pack(side="left", padx=(4, 2))
@@ -142,7 +151,7 @@ class KeyboardMePanel(_Base):
         self._sep(ribbon)
 
         # Run group.
-        g = RibbonGroup(ribbon, "Run")
+        g = self._grp(ribbon, "Run")
         g.pack(side="left", fill="y", pady=1)
         self.type_btn = self._ib(g.body, "play", "Type", self._start, accent="#1a8a4a")
         self.type_btn.pack(side="left")
@@ -150,9 +159,21 @@ class KeyboardMePanel(_Base):
         self.stop_btn.pack(side="left")
         self.stop_btn.set_enabled(False)
 
+        # Text-size group, pinned to the right end of the ribbon (replaces the
+        # old separate header row). Drives the app-wide zoom via the launcher.
+        tg = self._grp(ribbon, "Text size")
+        tg.pack(side="right", fill="y", padx=(0, 2), pady=1)
+        self._ib(tg.body, "zoomout", "Smaller", lambda: self._do_zoom(-0.1)).pack(side="left")
+        self._zoom_lbl = tk.Label(tg.body, text="100%", width=5, background=RIBBON_BG,
+                                  foreground="#444b53")
+        self._zoom_lbl.pack(side="left")
+        self._ib(tg.body, "zoomin", "Larger", lambda: self._do_zoom(+0.1)).pack(side="left")
+        ttk.Separator(ribbon, orient="vertical").pack(side="right", fill="y", padx=4, pady=3)
+
         # Status / typing alert, living in the toolbar (flashes during countdown).
         alert = tk.Frame(ribbon, background=RIBBON_BG)
         alert.pack(side="right", fill="both", expand=True, padx=(6, 2), pady=3)
+        self._alert = alert
         self.banner_wrap = tk.Frame(alert, highlightthickness=0, background=RIBBON_BG)
         self.banner_wrap.pack(fill="both", expand=True)
         self.banner = tk.Label(self.banner_wrap, text="", font="MinuxTitle",
@@ -183,10 +204,76 @@ class KeyboardMePanel(_Base):
         self._sync_mode()
         self._refresh_estimate()
 
+        # Make the ribbon responsive: when it can't fit, shed labels/captions.
+        ribbon.bind("<Configure>", lambda _e: self._schedule_reflow())
+        self.after(120, self._reflow)
+
+    # ----- responsive ribbon ----------------------------------------------- #
+    _MAX_LEVEL = 3   # 0 full | 1 icon-only | 2 +no captions | 3 +no fine slider
+
+    def _schedule_reflow(self) -> None:
+        if self._reflowing:
+            return
+        if self._reflow_after is not None:
+            try:
+                self.after_cancel(self._reflow_after)
+            except Exception:
+                pass
+        self._reflow_after = self.after(60, self._reflow)
+
+    def _reflow(self) -> None:
+        self._reflow_after = None
+        if not hasattr(self, "_ribbon"):
+            return
+        avail = self._ribbon.winfo_width()
+        if avail <= 1:
+            return
+        self._reflowing = True
+        try:
+            chosen = self._MAX_LEVEL
+            for level in range(0, self._MAX_LEVEL + 1):
+                self._apply_level(level)
+                self._ribbon.update_idletasks()
+                if self._ribbon_need() <= avail:
+                    chosen = level
+                    break
+            self._compact_level = chosen
+        finally:
+            self._reflowing = False
+
+    def _ribbon_need(self) -> int:
+        need = 0
+        for child in self._ribbon.winfo_children():
+            if child is self._alert:
+                need += 36          # the alert cell can shrink; reserve a little
+            else:
+                need += child.winfo_reqwidth()
+        return need + 8
+
+    def _apply_level(self, level: int) -> None:
+        compact = level >= 1
+        for b in self._icon_buttons:
+            b.set_compact(compact)
+        show_caption = level < 2
+        for g in self._ribbon_groups:
+            g.set_caption_visible(show_caption)
+        want_fine = level < 3
+        if want_fine != self._fine_visible:
+            self._fine_visible = want_fine
+            if want_fine:
+                self._fine.pack(side="left", padx=(6, 2))
+            else:
+                self._fine.pack_forget()
+
     def _ib(self, parent, icon, text, command, accent=None):
         b = IconButton(parent, icon, text=text, command=command, accent=accent)
         self._icon_buttons.append(b)
         return b
+
+    def _grp(self, parent, title):
+        g = RibbonGroup(parent, title)
+        self._ribbon_groups.append(g)
+        return g
 
     def _platform_hint(self) -> str:
         return ("Ready." if IS_WINDOWS else
@@ -284,6 +371,25 @@ class KeyboardMePanel(_Base):
         for b in self._icon_buttons:
             try:
                 b.relayout()
+            except Exception:
+                pass
+        self._update_zoom_label()
+
+    # ----- text-size (zoom) wiring ----------------------------------------- #
+    def set_zoom_host(self, zoom_fn, percent_fn) -> None:
+        """The launcher wires the app-wide zoom into this panel's ribbon."""
+        self._zoom_host = zoom_fn
+        self._percent_fn = percent_fn
+        self._update_zoom_label()
+
+    def _do_zoom(self, delta: float) -> None:
+        if self._zoom_host:
+            self._zoom_host(delta)
+
+    def _update_zoom_label(self) -> None:
+        if self._percent_fn and hasattr(self, "_zoom_lbl"):
+            try:
+                self._zoom_lbl.configure(text=f"{self._percent_fn()}%")
             except Exception:
                 pass
 

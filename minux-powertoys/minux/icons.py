@@ -129,9 +129,21 @@ def _gauge(line, poly, oval, arc, rect, c, a):
     line([12, 18, 16, 10], col=a)                      # needle
 
 
+def _zoomin(line, poly, oval, arc, rect, c, a):
+    oval(4, 4, 15, 15)                                 # magnifier lens
+    line([13.5, 13.5, 20, 20], w=2.7)                  # handle
+    line([9.5, 7, 9.5, 12], col=a); line([7, 9.5, 12, 9.5], col=a)  # plus
+
+
+def _zoomout(line, poly, oval, arc, rect, c, a):
+    oval(4, 4, 15, 15)
+    line([13.5, 13.5, 20, 20], w=2.7)
+    line([7, 9.5, 12, 9.5], col=a)                     # minus
+
+
 _ICONS = {
     "reset": _reset, "paste": _paste, "play": _play, "stop": _stop,
     "clock": _clock, "mouse": _mouse, "pencil": _pencil, "turtle": _turtle,
     "walk": _walk, "rabbit": _rabbit, "bolt": _bolt, "keyboard": _keyboard,
-    "gauge": _gauge,
+    "gauge": _gauge, "zoomin": _zoomin, "zoomout": _zoomout,
 }

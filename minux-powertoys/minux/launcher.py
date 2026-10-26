@@ -70,25 +70,19 @@ class MinuxApp:
         self.root.after(80, self._drain_actions)
 
     def _build_window(self) -> None:
-        # Slim header: just the live text-size control on the right (the window
-        # title bar already shows the app name). Scales the whole UI, remembered.
-        header = ttk.Frame(self.root, padding=(12, 8, 12, 0))
-        header.pack(fill="x")
-        ttk.Button(header, text="A+", width=3, command=lambda: self._zoom(+0.1)).pack(side="right", padx=1)
-        self._scale_lbl = ttk.Label(header, width=5, anchor="center",
-                                    text=f"{self._scaler.percent()}%")
-        self._scale_lbl.pack(side="right")
-        ttk.Button(header, text="A−", width=3, command=lambda: self._zoom(-0.1)).pack(side="right", padx=1)
-        ttk.Label(header, text="Text size:", foreground="#888").pack(side="right", padx=(0, 4))
-
+        # No separate header row -- the window title bar shows the app name, and
+        # the text-size control lives in each tool's ribbon (set_zoom_host below).
         self.notebook = ttk.Notebook(self.root)
-        self.notebook.pack(fill="both", expand=True, padx=12, pady=(8, 4))
+        self.notebook.pack(fill="both", expand=True, padx=10, pady=(8, 4))
         for i, toy in enumerate(all_toys()):
             tab = ttk.Frame(self.notebook)
             self.notebook.add(tab, text=toy.name)
             self._tabs[toy.key] = i
             try:
-                self._panels[toy.key] = toy.build(tab)
+                panel = toy.build(tab)
+                self._panels[toy.key] = panel
+                if hasattr(panel, "set_zoom_host"):
+                    panel.set_zoom_host(self._zoom, self._scaler.percent)
             except Exception as exc:  # a broken tool shows an error, not a crash
                 ttk.Label(tab, text=f"{toy.name} failed to load:\n{exc}",
                           foreground="#c00", padding=20).pack()
@@ -161,11 +155,10 @@ class MinuxApp:
     # ----- settings / zoom ------------------------------------------------- #
     def _zoom(self, delta: float) -> None:
         self._scaler.step(delta)
-        self._scale_lbl.configure(text=f"{self._scaler.percent()}%")
         for panel in self._panels.values():
             if hasattr(panel, "on_font_scaled"):
                 try:
-                    panel.on_font_scaled()
+                    panel.on_font_scaled()   # also refreshes the panel's % label
                 except Exception:
                     pass
         self._save()
