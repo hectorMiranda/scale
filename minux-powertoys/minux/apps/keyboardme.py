@@ -30,6 +30,7 @@ except Exception:  # pragma: no cover - headless
 
 from ..typing_engine import TypingProfile, build_plan, run_plan
 from ..platform_input import IS_WINDOWS, make_default_sink, mouse_moved, get_cursor_pos
+from ..widgets import LineNumberedText
 
 PRESETS = [("Slow & careful", 35), ("Natural", 70), ("Fast", 110), ("Human max", 160)]
 MAX_HUMAN_WPM = 160
@@ -56,9 +57,19 @@ class KeyboardMePanel(_Base):
     # ----- UI -------------------------------------------------------------- #
     def _build_ui(self) -> None:
         ttk.Label(self, text="Text to type", font="MinuxHeading").pack(anchor="w")
-        self.text = tk.Text(self, height=8, wrap="word")
-        self.text.pack(fill="both", expand=True, pady=(2, 8))
+        self.editor = LineNumberedText(self, on_change=self._refresh_estimate,
+                                       on_caret=self._on_caret, height=8)
+        self.editor.pack(fill="both", expand=True, pady=(2, 2))
+        self.text = self.editor.text  # existing code types/reads through self.text
         self.text.focus_set()
+
+        # Editor status strip: Ln/Col on the left, live typing estimate on the right.
+        estrip = ttk.Frame(self)
+        estrip.pack(fill="x", pady=(0, 8))
+        self.caret_lbl = ttk.Label(estrip, text="Ln 1, Col 1", foreground="#888")
+        self.caret_lbl.pack(side="left")
+        self.estimate_lbl = ttk.Label(estrip, text="", foreground="#0a6", anchor="e")
+        self.estimate_lbl.pack(side="right")
 
         speed = ttk.LabelFrame(self, text="Speed", padding=10)
         speed.pack(fill="x", pady=(0, 8))
@@ -157,18 +168,26 @@ class KeyboardMePanel(_Base):
                               target_seconds=max(self.duration_min.get(), 0.1) * 60.0, seed=1)
         return build_plan(self._get_text(), prof, seed=1)
 
+    def _on_caret(self, line: int, col: int) -> None:
+        if hasattr(self, "caret_lbl"):
+            self.caret_lbl.configure(text=f"Ln {line}, Col {col}")
+
+    def on_font_scaled(self) -> None:
+        """Called by the launcher after the app text size changes."""
+        self.after_idle(self.editor.refresh)
+
     def _refresh_estimate(self) -> None:
         if not hasattr(self, "wpm_label"):
             return
         self.wpm_label.configure(text=f"{self._current_wpm()} WPM")
         n = len(self._get_text())
         if not n:
-            self.status.configure(text=self._platform_hint())
+            self.estimate_lbl.configure(text="")
             return
         plan = self._plan()
-        self.status.configure(
-            text=f"{n} chars - est. {_fmt_duration(plan.total_seconds)} - "
-                 f"peak {plan.peak_wpm():.0f} WPM (cap {MAX_HUMAN_WPM})")
+        self.estimate_lbl.configure(
+            text=f"≈ {_fmt_duration(plan.total_seconds)} to type  ·  "
+                 f"{n} chars  ·  peak {plan.peak_wpm():.0f} WPM (cap {MAX_HUMAN_WPM})")
 
     # ----- settings persistence ------------------------------------------- #
     def get_settings(self) -> dict:

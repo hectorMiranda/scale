@@ -164,6 +164,12 @@ class MinuxApp:
     def _zoom(self, delta: float) -> None:
         self._scaler.step(delta)
         self._scale_lbl.configure(text=f"{self._scaler.percent()}%")
+        for panel in self._panels.values():
+            if hasattr(panel, "on_font_scaled"):
+                try:
+                    panel.on_font_scaled()
+                except Exception:
+                    pass
         self._save()
 
     def _restore_panel_settings(self) -> None:
