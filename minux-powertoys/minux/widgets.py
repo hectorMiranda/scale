@@ -72,49 +72,27 @@ class LineNumberedText(_Base):
                     "<Configure>", "<MouseWheel>"):
             self.text.bind(seq, self._on_edit, add="+")
 
-        # Right-click context menu (paste inserts at the caret, never clears).
-        self._build_context_menu()
+        # Right-click pastes the clipboard straight in at the click point --
+        # no menu, no extra clicks. It inserts (appends), never clears.
+        self.text.bind("<Button-3>", self._paste_at_click)
+        self.text.bind("<Button-2>", self._paste_at_click)
 
         # Redraw once the widget has real geometry.
         self.after(20, self._refresh)
 
-    # ----- right-click menu ------------------------------------------------ #
-    def _build_context_menu(self) -> None:
-        m = tk.Menu(self.text, tearoff=0)
-        m.add_command(label="Cut", command=lambda: self._menu_edit("<<Cut>>"))
-        m.add_command(label="Copy", command=lambda: self._menu_edit("<<Copy>>"))
-        m.add_command(label="Paste", command=lambda: self._menu_edit("<<Paste>>"))
-        m.add_separator()
-        m.add_command(label="Select all", command=self._select_all)
-        self._menu = m
-        # Button-3 is right-click on Windows/Linux; Button-2 covers some mice/macOS.
-        self.text.bind("<Button-3>", self._popup_menu)
-        self.text.bind("<Button-2>", self._popup_menu)
-
-    def _popup_menu(self, event):
-        # Enable/disable Cut/Copy depending on whether there's a selection.
-        has_sel = bool(self.text.tag_ranges("sel"))
-        self._menu.entryconfigure("Cut", state="normal" if has_sel else "disabled")
-        self._menu.entryconfigure("Copy", state="normal" if has_sel else "disabled")
+    # ----- right-click paste ----------------------------------------------- #
+    def _paste_at_click(self, event):
+        self.text.focus_set()
         try:
-            self._menu.tk_popup(event.x_root, event.y_root)
-        finally:
-            self._menu.grab_release()
-        return "break"
-
-    def _menu_edit(self, event_name: str) -> None:
-        try:
-            self.text.event_generate(event_name)   # built-in paste = insert at caret
+            self.text.mark_set("insert", f"@{event.x},{event.y}")  # caret where clicked
         except Exception:
             pass
-        self.text.focus_set()
+        try:
+            self.text.event_generate("<<Paste>>")   # insert clipboard at caret
+        except Exception:
+            pass
         self._on_edit()
-
-    def _select_all(self) -> None:
-        self.text.tag_add("sel", "1.0", "end-1c")
-        self.text.mark_set("insert", "end-1c")
-        self.text.focus_set()
-        self._refresh()
+        return "break"
 
     # ----- scrolling glue -------------------------------------------------- #
     def _on_scrollbar(self, *args) -> None:
