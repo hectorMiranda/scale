@@ -155,6 +155,9 @@ class KeyboardMePanel(_Base):
         g.pack(side="left", fill="y", pady=1)
         self.type_btn = self._ib(g.body, "play", "Type", self._start, accent="#1a8a4a")
         self.type_btn.pack(side="left")
+        self.type_sel_btn = self._ib(g.body, "playsel", "Type selection",
+                                     self._start_selection, accent="#1a8a4a")
+        self.type_sel_btn.pack(side="left")
         self.stop_btn = self._ib(g.body, "stop", "Stop", self._stop, accent="#c0392b")
         self.stop_btn.pack(side="left")
         self.stop_btn.set_enabled(False)
@@ -186,6 +189,8 @@ class KeyboardMePanel(_Base):
         self.editor.pack(fill="both", expand=True, pady=(0, 2))
         self.text = self.editor.text  # existing code types/reads through self.text
         self.text.focus_set()
+        # Selection changes update the estimate and the Type-selection button.
+        self.text.bind("<<Selection>>", lambda _e: self._refresh_estimate(), add="+")
 
         # Editor status strip: Ln/Col on the left, live typing estimate on the right.
         estrip = ttk.Frame(self)
@@ -336,6 +341,15 @@ class KeyboardMePanel(_Base):
     def _get_text(self) -> str:
         return self.text.get("1.0", "end-1c")
 
+    def _get_selected_text(self) -> str:
+        """The highlighted text in the editor, or "" when nothing is selected."""
+        try:
+            if self.text.tag_ranges("sel"):
+                return self.text.get("sel.first", "sel.last")
+        except tk.TclError:
+            pass
+        return ""
+
     def _set_text(self, value: str) -> None:
         self.text.delete("1.0", "end")
         if value:
@@ -354,12 +368,13 @@ class KeyboardMePanel(_Base):
             clip = ""          # empty or non-text clipboard
         self._set_text(clip)
 
-    def _plan(self):
+    def _plan(self, text: Optional[str] = None):
         prof = self._profile()
+        text = self._get_text() if text is None else text
         if self.mode.get() == "duration":
-            return build_plan(self._get_text(), prof,
+            return build_plan(text, prof,
                               target_seconds=max(self.duration_min.get(), 0.1) * 60.0, seed=1)
-        return build_plan(self._get_text(), prof, seed=1)
+        return build_plan(text, prof, seed=1)
 
     def _on_caret(self, line: int, col: int) -> None:
         if hasattr(self, "caret_lbl"):
@@ -397,13 +412,19 @@ class KeyboardMePanel(_Base):
         if not hasattr(self, "wpm_label"):
             return
         self.wpm_label.configure(text=f"{self._current_wpm()} WPM")
-        n = len(self._get_text())
+        sel = self._get_selected_text()
+        running = bool(self._worker and self._worker.is_alive())
+        if hasattr(self, "type_sel_btn"):
+            self.type_sel_btn.set_enabled(bool(sel) and not running)
+        text = sel or self._get_text()
+        n = len(text)
         if not n:
             self.estimate_lbl.configure(text="")
             return
-        plan = self._plan()
+        plan = self._plan(text)
+        what = "selection: " if sel else ""
         self.estimate_lbl.configure(
-            text=f"≈ {_fmt_duration(plan.total_seconds)} to type  ·  "
+            text=f"{what}≈ {_fmt_duration(plan.total_seconds)} to type  ·  "
                  f"{n} chars  ·  peak {plan.peak_wpm():.0f} WPM (cap {MAX_HUMAN_WPM})")
 
     # ----- settings persistence ------------------------------------------- #
@@ -440,20 +461,32 @@ class KeyboardMePanel(_Base):
 
     # ----- run / stop ------------------------------------------------------ #
     def _start(self) -> None:
-        if self._worker and self._worker.is_alive():
-            return
         if not self._get_text():
             messagebox.showinfo("KeyboardMe", "Type or paste some text first.")
             return
+        self._begin(self._get_text())
+
+    def _start_selection(self) -> None:
+        """Type only the highlighted part of the editor."""
+        sel = self._get_selected_text()
+        if not sel:
+            messagebox.showinfo("KeyboardMe", "Select some text in the editor first.")
+            return
+        self._begin(sel)
+
+    def _begin(self, text: str) -> None:
+        if self._worker and self._worker.is_alive():
+            return
         prof = self._profile()
         if self.mode.get() == "duration":
-            plan = build_plan(self._get_text(), prof,
+            plan = build_plan(text, prof,
                               target_seconds=max(self.duration_min.get(), 0.1) * 60.0)
         else:
-            plan = build_plan(self._get_text(), prof)
+            plan = build_plan(text, prof)
 
         self._abort.clear()
         self.type_btn.set_enabled(False)
+        self.type_sel_btn.set_enabled(False)
         self.stop_btn.set_enabled(True)
         self.progress.configure(maximum=max(plan.printable_chars, 1), value=0)
         cd = max(0, int(self.countdown.get()))
@@ -554,6 +587,7 @@ class KeyboardMePanel(_Base):
                 elif kind == "done":
                     self.type_btn.set_enabled(True)
                     self.stop_btn.set_enabled(False)
+                    self._refresh_estimate()   # re-enables Type selection if still selected
                     self.banner.configure(text="")
                     self._stop_flash()
                     self.status.configure(text=evt[1])

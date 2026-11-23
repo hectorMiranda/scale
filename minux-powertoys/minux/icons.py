@@ -67,6 +67,12 @@ def _play(line, poly, oval, arc, rect, c, a):
     poly([7, 5, 7, 19, 19, 12], fill=a)               # right-pointing triangle
 
 
+def _playsel(line, poly, oval, arc, rect, c, a):
+    rect(3, 4, 15, 9, col=c, fill="#cfe3ff", w=1.4)   # highlighted (selected) text band
+    line([3, 13, 11, 13], w=1.8); line([3, 17, 9, 17], w=1.8)   # unselected lines
+    poly([13, 11, 13, 21, 21, 16], fill=a)            # play triangle
+
+
 def _stop(line, poly, oval, arc, rect, c, a):
     rect(6, 6, 18, 18, col=a, fill=a, w=1.0)
 
@@ -142,7 +148,7 @@ def _zoomout(line, poly, oval, arc, rect, c, a):
 
 
 _ICONS = {
-    "reset": _reset, "paste": _paste, "play": _play, "stop": _stop,
+    "reset": _reset, "paste": _paste, "play": _play, "playsel": _playsel, "stop": _stop,
     "clock": _clock, "mouse": _mouse, "pencil": _pencil, "turtle": _turtle,
     "walk": _walk, "rabbit": _rabbit, "bolt": _bolt, "keyboard": _keyboard,
     "gauge": _gauge, "zoomin": _zoomin, "zoomout": _zoomout,
