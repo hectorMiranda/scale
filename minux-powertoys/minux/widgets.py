@@ -255,6 +255,11 @@ class IconButton(tk.Frame if tk is not None else object):
         accent = (self._accent or color) if self._enabled else _ICON_DISABLED
         icons.draw(self.canvas, self._icon, self._size, color, accent)
 
+    def set_accent(self, accent: Optional[str]) -> None:
+        """Change the icon's accent colour (e.g. a colour-swatch icon)."""
+        self._accent = accent
+        self._redraw()
+
     def relayout(self) -> None:
         """Re-size the icon to the current text size (host calls after zoom)."""
         self._size = self._icon_size()

@@ -24,11 +24,11 @@ from typing import Optional
 
 try:
     import tkinter as tk
-    from tkinter import ttk, messagebox
+    from tkinter import ttk, messagebox, colorchooser
 except Exception:  # pragma: no cover - headless
     tk = None  # type: ignore
 
-from ..typing_engine import TypingProfile, build_plan, run_plan
+from ..typing_engine import TypingProfile, build_plan, run_plan, source_progress
 from ..platform_input import IS_WINDOWS, make_default_sink, mouse_moved, get_cursor_pos
 from ..widgets import LineNumberedText, IconButton, RibbonGroup, RIBBON_BG
 
@@ -40,6 +40,19 @@ PRESETS = [
     ("bolt", "Human max", 160),
 ]
 MAX_HUMAN_WPM = 160
+
+# Background tints for marking text that has already been typed. All light, so
+# the dark editor text stays readable on top of them.
+TYPED_COLORS = [
+    ("Green", "#c8f1d4"),
+    ("Blue", "#cfe0ff"),
+    ("Yellow", "#fff1a6"),
+    ("Orange", "#ffdcb5"),
+    ("Purple", "#e4d7ff"),
+    ("Pink", "#ffd3e4"),
+    ("Gray", "#e0e0e0"),
+]
+DEFAULT_TYPED_COLOR = TYPED_COLORS[0][1]
 
 
 if tk is not None:
@@ -58,6 +71,9 @@ class KeyboardMePanel(_Base):
         self._flash_on = False
         self._zoom_host = None       # set by the launcher (set_zoom_host)
         self._percent_fn = None
+        self.typed_color = DEFAULT_TYPED_COLOR   # "" = don't mark typed text
+        self._src_map = [0]          # printable keystrokes -> source chars typed
+        self._marked = 0             # source chars already tagged this run
         self._build_ui()
         self.winfo_toplevel().bind("<Escape>", lambda _e: self._stop())
         self.after(60, self._pump)
@@ -161,6 +177,15 @@ class KeyboardMePanel(_Base):
         self.stop_btn = self._ib(g.body, "stop", "Stop", self._stop, accent="#c0392b")
         self.stop_btn.pack(side="left")
         self.stop_btn.set_enabled(False)
+        self._sep(ribbon)
+
+        # Marking group: what has been typed gets a coloured background.
+        g = self._grp(ribbon, "Marking")
+        g.pack(side="left", fill="y", pady=1)
+        self._color_btn = self._ib(g.body, "highlight", "Mark color", self._color_menu,
+                                  accent=DEFAULT_TYPED_COLOR)
+        self._color_btn.pack(side="left")
+        self._ib(g.body, "eraser", "Clear marks", self._clear_marks).pack(side="left")
 
         # Text-size group, pinned to the right end of the ribbon (replaces the
         # old separate header row). Drives the app-wide zoom via the launcher.
@@ -191,6 +216,9 @@ class KeyboardMePanel(_Base):
         self.text.focus_set()
         # Selection changes update the estimate and the Type-selection button.
         self.text.bind("<<Selection>>", lambda _e: self._refresh_estimate(), add="+")
+        # Text that has been typed out is tagged "typed" (selection stays on top).
+        self.text.tag_configure("typed", background=self.typed_color)
+        self.text.tag_raise("sel")
 
         # Editor status strip: Ln/Col on the left, live typing estimate on the right.
         estrip = ttk.Frame(self)
@@ -436,6 +464,7 @@ class KeyboardMePanel(_Base):
             "countdown": int(self.countdown.get()),
             "add_typos": bool(self.add_typos.get()),
             "stop_on_move": bool(self.stop_on_move.get()),
+            "typed_color": self.typed_color,
         }
 
     def apply_settings(self, d: dict) -> None:
@@ -454,17 +483,72 @@ class KeyboardMePanel(_Base):
                 self.add_typos.set(bool(d["add_typos"]))
             if "stop_on_move" in d:
                 self.stop_on_move.set(bool(d["stop_on_move"]))
+            if isinstance(d.get("typed_color"), str):
+                self._set_typed_color(d["typed_color"])
         except Exception:
             pass
         self._sync_mode()
         self._refresh_estimate()
+
+    # ----- marking typed text --------------------------------------------- #
+    def _mark_typed(self, printable_done: int) -> None:
+        """Colour the source text typed so far in this run."""
+        if not self.typed_color:
+            return
+        m = self._src_map
+        src = m[min(max(printable_done, 0), len(m) - 1)]
+        if src <= self._marked:
+            return
+        try:
+            self.text.tag_add("typed", f"km_start + {self._marked} chars",
+                              f"km_start + {src} chars")
+            self.text.see(f"km_start + {src} chars")
+        except tk.TclError:
+            return
+        self._marked = src
+
+    def _clear_marks(self) -> None:
+        self.text.tag_remove("typed", "1.0", "end")
+
+    def _set_typed_color(self, color: str) -> None:
+        self.typed_color = color or ""
+        if color:
+            self.text.tag_configure("typed", background=color)
+            self._color_btn.set_accent(color)
+        else:
+            self.text.tag_remove("typed", "1.0", "end")
+            self._color_btn.set_accent(None)
+
+    def _color_menu(self) -> None:
+        menu = tk.Menu(self, tearoff=0)
+        choice = tk.StringVar(value=self.typed_color)
+        menu._choice = choice   # keep the var alive while the menu is up
+        for name, hexv in TYPED_COLORS:
+            menu.add_radiobutton(label=name, variable=choice, value=hexv,
+                                 background=hexv, activebackground=hexv,
+                                 command=lambda v=hexv: self._set_typed_color(v))
+        menu.add_command(label="Custom color...", command=self._pick_custom_color)
+        menu.add_separator()
+        menu.add_radiobutton(label="Don't mark typed text", variable=choice, value="",
+                             command=lambda: self._set_typed_color(""))
+        b = self._color_btn
+        try:
+            menu.tk_popup(b.winfo_rootx(), b.winfo_rooty() + b.winfo_height())
+        finally:
+            menu.grab_release()
+
+    def _pick_custom_color(self) -> None:
+        _rgb, hexv = colorchooser.askcolor(color=self.typed_color or DEFAULT_TYPED_COLOR,
+                                           title="Colour for typed text", parent=self)
+        if hexv:
+            self._set_typed_color(hexv)
 
     # ----- run / stop ------------------------------------------------------ #
     def _start(self) -> None:
         if not self._get_text():
             messagebox.showinfo("KeyboardMe", "Type or paste some text first.")
             return
-        self._begin(self._get_text())
+        self._begin(self._get_text(), "1.0")
 
     def _start_selection(self) -> None:
         """Type only the highlighted part of the editor."""
@@ -472,9 +556,9 @@ class KeyboardMePanel(_Base):
         if not sel:
             messagebox.showinfo("KeyboardMe", "Select some text in the editor first.")
             return
-        self._begin(sel)
+        self._begin(sel, self.text.index("sel.first"))
 
-    def _begin(self, text: str) -> None:
+    def _begin(self, text: str, start_index: str = "1.0") -> None:
         if self._worker and self._worker.is_alive():
             return
         prof = self._profile()
@@ -483,6 +567,13 @@ class KeyboardMePanel(_Base):
                               target_seconds=max(self.duration_min.get(), 0.1) * 60.0)
         else:
             plan = build_plan(text, prof)
+
+        # Remember where this text starts in the editor; the mark rides along
+        # if the text is edited mid-run, so progress marks land correctly.
+        self.text.mark_set("km_start", start_index)
+        self.text.mark_gravity("km_start", "left")
+        self._src_map = source_progress(plan)
+        self._marked = 0
 
         self._abort.clear()
         self.type_btn.set_enabled(False)
@@ -583,6 +674,7 @@ class KeyboardMePanel(_Base):
                     self.status.configure(text=evt[1])
                 elif kind == "progress":
                     self.progress.configure(value=evt[1])
+                    self._mark_typed(evt[1])
                     self.status.configure(text=f"Typing... {evt[1]}/{evt[2]}")
                 elif kind == "done":
                     self.type_btn.set_enabled(True)

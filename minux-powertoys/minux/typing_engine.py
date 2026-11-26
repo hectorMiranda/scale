@@ -193,6 +193,27 @@ def build_plan(
     return TypingPlan(strokes)
 
 
+def source_progress(plan: TypingPlan) -> List[int]:
+    """Map "printable keystrokes sent" -> "characters of the source text done".
+
+    ``result[k]`` is how many characters of the original text are fully typed
+    after the first ``k`` printable keystrokes. A typo's wrong character (a
+    printable stroke immediately undone by a backspace) doesn't advance the
+    source, so highlighting what has been typed never runs ahead of the text.
+    """
+    out = [0]
+    src = 0
+    strokes = plan.strokes
+    for i, s in enumerate(strokes):
+        if s.kind != "char":
+            continue
+        is_typo = i + 1 < len(strokes) and strokes[i + 1].kind == "backspace"
+        if not is_typo:
+            src += 1
+        out.append(src)
+    return out
+
+
 def _jittered(
     base: float,
     floor: float,

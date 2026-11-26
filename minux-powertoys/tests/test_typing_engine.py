@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from minux.typing_engine import (  # noqa: E402
-    TypingProfile, build_plan, run_plan, HARD_CEILING_WPM,
+    TypingProfile, build_plan, run_plan, HARD_CEILING_WPM, source_progress,
 )
 from minux.platform_input import SimulationSink  # noqa: E402
 
@@ -86,6 +86,18 @@ def test_abort_stops_early():
                     on_progress=progress, sleep=lambda _s: None)
     assert done <= 11
     assert len(sink.text) <= 11
+
+
+def test_source_progress_tracks_text_not_typos():
+    prof = TypingProfile(wpm=110, typo_chance=0.5)
+    plan = build_plan(SAMPLE, prof, seed=3)
+    prog = source_progress(plan)
+    assert len(prog) == plan.printable_chars + 1
+    assert prog[0] == 0 and prog[-1] == len(SAMPLE)
+    assert all(b - a in (0, 1) for a, b in zip(prog, prog[1:]))
+    assert plan.printable_chars > len(SAMPLE)   # some typos happened
+    clean = source_progress(build_plan(SAMPLE, TypingProfile(wpm=70), seed=3))
+    assert clean == list(range(len(SAMPLE) + 1))
 
 
 def _run_all():

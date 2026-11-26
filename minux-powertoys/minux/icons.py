@@ -73,6 +73,19 @@ def _playsel(line, poly, oval, arc, rect, c, a):
     poly([13, 11, 13, 21, 21, 16], fill=a)            # play triangle
 
 
+def _highlight(line, poly, oval, arc, rect, c, a):
+    rect(3, 17, 21, 21, col=a, fill=a, w=1.0)         # the colour swatch / marked band
+    poly([8, 14, 15, 4, 19, 7, 12, 17], fill="")
+    line([8, 14, 15, 4, 19, 7, 12, 17, 8, 14])        # marker body
+    line([8, 14, 7, 16, 10, 16, 12, 17], w=1.6)       # chisel tip
+
+
+def _eraser(line, poly, oval, arc, rect, c, a):
+    line([4, 15, 12, 7, 19, 14, 11, 21, 8, 21, 4, 17, 4, 15])   # eraser block
+    line([8, 11, 15, 18])                             # band
+    line([13, 21, 21, 21], w=1.6)                     # wiped line
+
+
 def _stop(line, poly, oval, arc, rect, c, a):
     rect(6, 6, 18, 18, col=a, fill=a, w=1.0)
 
@@ -149,6 +162,7 @@ def _zoomout(line, poly, oval, arc, rect, c, a):
 
 _ICONS = {
     "reset": _reset, "paste": _paste, "play": _play, "playsel": _playsel, "stop": _stop,
+    "highlight": _highlight, "eraser": _eraser,
     "clock": _clock, "mouse": _mouse, "pencil": _pencil, "turtle": _turtle,
     "walk": _walk, "rabbit": _rabbit, "bolt": _bolt, "keyboard": _keyboard,
     "gauge": _gauge, "zoomin": _zoomin, "zoomout": _zoomout,
